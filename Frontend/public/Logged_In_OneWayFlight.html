@@ -1,0 +1,838 @@
+<!DOCTYPE HTML>
+<!--
+	Name: Duncan Lim Qing Rong
+	Class: DISM/FT/2A/01
+	Admin Number: P2136785
+-->
+
+<!--
+	Traveler by freehtml5.co
+	Twitter: http://twitter.com/fh5co
+	URL: http://freehtml5.co
+-->
+<html>
+	<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SP|Air &mdash; Duncan's BED CA2 &mdash; DISM2A01.org</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<meta name="description" content="Free HTML5 Website Template by FreeHTML5.co" />
+	<meta name="keywords" content="free website templates, free html5, free template, free bootstrap, free website template, html5, css3, mobile first, responsive" />
+	<meta name="author" content="FreeHTML5.co" />
+
+  	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content=""/>
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content=""/>
+	<meta property="og:description" content=""/>
+	<meta name="twitter:title" content="" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="" />
+
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+	
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="css/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="css/icomoon.css">
+	<!-- Themify Icons-->
+	<link rel="stylesheet" href="css/themify-icons.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="css/bootstrap.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/magnific-popup.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
+
+	<!-- Owl Carousel  -->
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+
+	<!-- Theme style  -->
+	<link rel="stylesheet" href="css/style.css">
+
+	<!-- Modernizr JS -->
+	<script src="js/modernizr-2.6.2.min.js"></script>
+	<!-- FOR IE9 below -->
+	<!--[if lt IE 9]>
+	<script src="js/respond.min.js"></script>
+	<![endif]-->
+	
+	<!-- Icons -->
+	<script src="https://kit.fontawesome.com/4d486d1312.js" crossorigin="anonymous"></script>
+
+	<!--Function to Expand Flight Details-->
+	<script>
+		function clearLocal() {
+			localStorage.clear();
+		}
+	</script>
+
+	<script>
+		$(document).ready(function() {
+		
+		$(".ExpandDetails").on('click', function(event) {
+			
+			id = $(this).closest('td').parent()[0].sectionRowIndex;
+			document.getElementById(`hidden_row${id}`).style.display = 'block';
+			});
+		})
+	</script>
+
+	<script>
+		function TrimColon(text) {
+			return text.toString().replace(/^(.*?):*$/, '$1');
+		}
+	</script>
+
+	<!--Function to Handle Book Flight Button-->
+	<script type="text/javascript">
+		function showHideRow(row) {
+			$(row).toggle(300);
+		}
+	</script>
+
+	<script type="text/javascript">
+		function BookingBtn(rowID) {
+			var element = document.getElementById(`FlightCode${rowID}`).textContent
+			
+			var FlightCode = TrimColon(element).split(':')
+			FlightCode = FlightCode[1]
+			
+			//Get FlightsJSON Data
+			var Flights = sessionStorage.getItem("FlightsList")
+			var FlightsJSONData = JSON.parse(Flights)
+
+			for(let i = 0; i < FlightsJSONData.length; i++) {
+
+				if(FlightCode.trim() == FlightsJSONData[i].FlightCode) {
+
+					var BookingDetails = {	"FlightID": FlightsJSONData[i].FlightID,
+											"FlightCode": FlightsJSONData[i].FlightCode,
+											"Aircraft": FlightsJSONData[i].Aircraft,
+											"OriginAirport": FlightsJSONData[i].OriginAirport,
+											"DestinationAirport": FlightsJSONData[i].DestinationAirport,
+											"EmbarkDate": FlightsJSONData[i].EmbarkDate,
+											"ArrivalDate": FlightsJSONData[i].ArrivalDate,
+											"TravelTime": FlightsJSONData[i].TravelTime,
+											"Price": FlightsJSONData[i].Price
+					}
+
+					sessionStorage.setItem("BookingDetails", JSON.stringify(BookingDetails))
+					
+					alert('Please Fill In Passenger Info')
+
+					showHideRow('#PassForm')
+
+					$('html, body').animate({
+						scrollTop: $("#PassForm").offset().top
+					}, 500);
+				}	
+			}
+		}
+	</script>
+
+	<script>
+		$(document).ready(function() {
+			element = document.getElementById('PISubmit_btn')
+			element.onclick = function() {return false};
+
+			$("#PISubmit_btn").click(function () {
+				var tmpName = $('#CustomersName').val()
+				var tmpPassport = $('#PassportNum').val();
+				var tmpNationality = $('#nationality').val();
+				var tmpAge = $('#Age').val();
+
+				if(tmpName == "" || tmpPassport == '' || tmpNationality == null || tmpAge == "") {
+					alert('Please Fill Up Required Fields')
+
+				} else {
+					var PassengerInfo = {"FullName":tmpName,
+										"Passport":tmpPassport,
+										"Nationality":tmpNationality,
+										"Age":tmpAge}
+
+					sessionStorage.setItem("PassengerInfo", JSON.stringify(PassengerInfo))
+					window.location.assign('http://localhost:3001/Logged_In_Checkout.html')
+					
+				}
+			})
+			return false
+		})
+	</script>
+
+	<script>
+		function getDateAndTime (Timestamp){
+
+			var d = new Date(Timestamp);
+			d.getUTCFullYear();
+			d.getUTCMonth();
+			d.getUTCDate();
+			d.getUTCHours();
+			d.getUTCMinutes();
+			d.getUTCSeconds()
+			return(d.toUTCString())
+		}
+
+		function getDate (Timestamp){
+
+			var d = new Date(Timestamp);
+			d.getFullYear();
+			d.getMonth();
+			d.getDay();
+			return(d.toLocaleDateString())
+		}
+
+		function LocalDateNow () {
+			var d = new Date()
+			d.getFullYear();
+			d.getMonth();
+			d.getDay();
+			return(d.toLocaleDateString())
+		}
+	</script>
+
+	<!------------------Flights Table Filler----------------->
+	<script>
+		$(document).ready(function() {
+			//Retrieve Search Details
+			var searchDetails = sessionStorage.getItem('SearchDetails')
+			var searchDetailsJSON = JSON.parse(searchDetails)
+
+			var tmpOrigin = searchDetailsJSON.OriginAirport
+			var tmpDestination = searchDetailsJSON.DestinationAirport
+			var tmpDepartDate = searchDetailsJSON.DepartDate
+
+			$.ajax({
+				url: `http://localhost:8081/api/flightDirect/${tmpOrigin}/${tmpDestination}`,
+				type: 'GET',
+				contentType: "application/json;",
+				dataType: 'json',
+				success: function (data, textStatus, xhr) {
+
+					if (data != null) {
+						sessionStorage.setItem("FlightsList", JSON.stringify(data))
+						console.log('GET Success [Flights]')
+						var Flights = sessionStorage.getItem("FlightsList")
+						var FlightsJSONData = JSON.parse(Flights)
+
+						var postHTML = ''
+						var afterhtml = ''
+
+						for(let i = 0; i < FlightsJSONData.length; i++) {
+
+							if((Date.parse(getDate(tmpDepartDate)) == Date.parse(getDate(FlightsJSONData[i].EmbarkDate))) == true && (Date.parse(LocalDateNow()) <= Date.parse(getDate(FlightsJSONData[i].EmbarkDate))) == true) {
+								
+								postHTML += `<tr onclick=showHideRow(hidden_row${i})>
+												<td style="width: auto;">${FlightsJSONData[i].FlightCode}</td>
+												<td style="width: auto;">${FlightsJSONData[i].Aircraft}</td>
+												<td style="width: auto;">${FlightsJSONData[i].OriginAirport}</td>
+												<td style="width: auto;">${FlightsJSONData[i].DestinationAirport}</td>
+												<td style="width: auto;">${FlightsJSONData[i].TravelTime}</td>
+												<td style="width: auto;">$${FlightsJSONData[i].Price.toFixed(2)}</td>
+											</tr>
+																							
+											<tr id='hidden_row${i}' class='hidden_row'>
+												<td colspan=6>
+													<div>
+														<h4 class='col-xs-12' style='margin-top: 14px; font-weight: 500; color: black;'>Flight Details</h4>
+														<h5 id='FlightCode${i}' class='col-xs-12' style='font-weight:500; color: black;'>Flight Code: ${FlightsJSONData[i].FlightCode}</h5>
+														<div style = 'margin-top: 10px;'>
+															<i class='fas fa-plane-departure col-xs-1' style='font-size:20px; padding-right: 0px;'></i>
+															<h5 class='col-xs-2' style = 'padding-left: 0px'>${FlightsJSONData[i].OriginAirport}</h5>
+															<h5 class='col-xs-3' style = 'padding-left: 0px'>${getDateAndTime(FlightsJSONData[i].EmbarkDate)}</h5>
+															
+															<i class="fa-regular fa-clock col-xs-1" style='font-size:20px; padding-right: 0px; font-weight: 600; margin-bottom: 5px;'></i>
+															<h5 class='col-xs-1' style = 'padding-left: 0px'>Duration:</h5>
+															<h5 class='col-xs-4' style='padding-left: 0px;'>${FlightsJSONData[i].TravelTime}</h5>
+
+															<i class='fas fa-plane-arrival col-xs-1' style='font-size:20px; padding-right: 0px;'></i>
+															<h5 class='col-xs-2' style='padding-left: 0px'>${FlightsJSONData[i].DestinationAirport}</h5>
+															<h5 class='col-xs-3' style = 'padding-left: 0px'>${getDateAndTime(FlightsJSONData[i].ArrivalDate)}</h5>
+
+															<i class="fa-regular fa-dollar-sign col-xs-1" style='font-size:20px; padding-right: 0px; font-weight: 600; margin-left: 4px'></i>
+															<h5 class='col-xs-1' style = 'padding-left: 0px'>Price:</h5>
+															<h5 class='col-xs-3' style='padding-left: 0px;'>$${FlightsJSONData[i].Price.toFixed(2)}</h5>
+														</div>
+														<div class='col-xs-12'>
+															<input type="submit" id='Book_btn${i}' onclick=BookingBtn(${i}) class="btn btn-primary" style="padding-top: 6px; padding-bottom: 6px; margin-top: 20px; margin-bottom: 10px;" value="Book Flight">
+														</div>
+													</div>
+												</td>
+											</tr>`
+							}
+						}
+
+						$('#FlightsTable').append(postHTML)
+
+						if (postHTML == '') {
+							//Retrieve Airport JSON
+							var AirportList = sessionStorage.getItem('AirportList')
+							var AirportJSONList = JSON.parse(AirportList)
+
+							var Origin = ''
+							var Destination = ''
+
+							//Get Origin Airport
+							for(let i = 0; i < AirportJSONList.length; i++) {
+									
+								if (tmpOrigin == AirportJSONList[i].AirportID) {
+									Origin = AirportJSONList[i].Name
+								}
+							}
+
+							//Get Destination Airport
+							for(let i = 0; i < AirportJSONList.length; i++) {
+										
+								if (tmpDestination == AirportJSONList[i].AirportID) {
+									Destination = AirportJSONList[i].Name
+								}
+							}
+
+							postHTML = `<tr>
+											<td colspan=6>
+												<h4 class='col-xs-12' style='text-align: center; margin-top: 20px; font-weight: 400; color: #555555'>No  available  flights  from [${Origin}  -->  ${Destination}]  on  [${getDate(tmpDepartDate)}]</h4>
+											</td>
+										</tr>`
+
+							$('#FlightsTable').append(postHTML)
+
+							postHTML = ''
+
+							for(let i = 0; i < FlightsJSONData.length; i++) {
+
+								if((Date.parse(getDate(tmpDepartDate)) <= Date.parse(getDate(FlightsJSONData[i].EmbarkDate))) == true && (Date.parse(LocalDateNow()) <= Date.parse(getDate(FlightsJSONData[i].EmbarkDate))) == true) {
+									
+									postHTML += `<tr onclick=showHideRow(hidden_row${i})>
+												<td style="width: auto;">${FlightsJSONData[i].FlightCode}</td>
+												<td style="width: auto;">${FlightsJSONData[i].Aircraft}</td>
+												<td style="width: auto;">${FlightsJSONData[i].OriginAirport}</td>
+												<td style="width: auto;">${FlightsJSONData[i].DestinationAirport}</td>
+												<td style="width: auto;">${FlightsJSONData[i].TravelTime}</td>
+												<td style="width: auto;">$${FlightsJSONData[i].Price.toFixed(2)}</td>
+											</tr>
+																							
+											<tr id='hidden_row${i}' class='hidden_row'>
+												<td colspan=6>
+													<div>
+														<h4 class='col-xs-12' style='margin-top: 14px; font-weight: 500; color: black;'>Flight Details</h4>
+														<h5 id='FlightCode${i}' class='col-xs-12' style='font-weight:500; color: black;'>Flight Code: ${FlightsJSONData[i].FlightCode}</h5>
+														<div style = 'margin-top: 10px;'>
+															<i class='fas fa-plane-departure col-xs-1' style='font-size:20px; padding-right: 0px;'></i>
+															<h5 class='col-xs-2' style = 'padding-left: 0px'>${FlightsJSONData[i].OriginAirport}</h5>
+															<h5 class='col-xs-3' style = 'padding-left: 0px'>${getDateAndTime(FlightsJSONData[i].EmbarkDate)}</h5>
+															
+															<i class="fa-regular fa-clock col-xs-1" style='font-size:20px; padding-right: 0px; font-weight: 600; margin-bottom: 5px;'></i>
+															<h5 class='col-xs-1' style = 'padding-left: 0px'>Duration:</h5>
+															<h5 class='col-xs-4' style='padding-left: 0px;'>${FlightsJSONData[i].TravelTime}</h5>
+
+															<i class='fas fa-plane-arrival col-xs-1' style='font-size:20px; padding-right: 0px;'></i>
+															<h5 class='col-xs-2' style='padding-left: 0px'>${FlightsJSONData[i].DestinationAirport}</h5>
+															<h5 class='col-xs-3' style = 'padding-left: 0px'>${getDateAndTime(FlightsJSONData[i].ArrivalDate)}</h5>
+
+															<i class="fa-regular fa-dollar-sign col-xs-1" style='font-size:20px; padding-right: 0px; font-weight: 600; margin-left: 4px'></i>
+															<h5 class='col-xs-1' style = 'padding-left: 0px'>Price:</h5>
+															<h5 class='col-xs-3' style='padding-left: 0px;'>$${FlightsJSONData[i].Price.toFixed(2)}</h5>
+														</div>
+														<div class='col-xs-12'>
+															<input type="submit" id='Book_btn${i}' onclick=BookingBtn(${i}) class="btn btn-primary" style="padding-top: 6px; padding-bottom: 6px; margin-top: 20px; margin-bottom: 10px;" value="Book Flight">
+														</div>
+													</div>
+												</td>
+											</tr>`
+								}
+							}
+
+							if(postHTML != null) {
+
+								afterhtml+= `<tr style = 'background-color: #324960;'>
+												<td colspan=6>
+													<h5 class='col-xs-12' style='text-align: center; margin-top: 5px; margin-bottom: 5px; margin-left: 20px; font-weight: 400; color: white;'>Other Available Flights</h5>
+												</td>
+											</tr>`
+
+								$('#FlightsTable').append(afterhtml)
+								$('#FlightsTable').append(postHTML)
+							}
+							
+						}
+
+					} else {
+						console.log('GET Failure [Flights]')
+					}
+				},
+				error: function (xhr, textStatus, errorThrown) {
+
+					//Retrieve Airport JSON
+					var AirportList = sessionStorage.getItem('AirportList')
+					var AirportJSONList = JSON.parse(AirportList)
+
+					var Origin = ''
+					var Destination = ''
+
+					//Get Origin Airport
+					for(let i = 0; i < AirportJSONList.length; i++) {
+							
+						if (tmpOrigin == AirportJSONList[i].AirportID) {
+							Origin = AirportJSONList[i].Name
+						}
+					}
+					
+					//Get Destination Airport
+					for(let i = 0; i < AirportJSONList.length; i++) {
+								
+						if (tmpDestination == AirportJSONList[i].AirportID) {
+							Destination = AirportJSONList[i].Name
+						}
+					}
+
+					postHTML = `<tr>
+									<td colspan=6>
+										<h4 class='col-xs-12' style='text-align: center; margin-top: 20px; font-weight: 400; color: #555555'>There  are  currently  NO  available  flights  from [${Origin}  -->  ${Destination}]</h4>
+									</td>
+								</tr>`
+
+					$('#FlightsTable').append(postHTML)
+
+					console.log('Error in Operation');  
+					console.log(JSON.stringify(xhr))
+					console.log(textStatus)
+					console.log(JSON.stringify(errorThrown))
+				}
+			})
+
+			return false
+		})
+	</script>
+	</head>
+	<body>
+		
+	<div class="gtco-loader"></div>
+	
+	<div id="page">
+
+	<!-- <div class="page-inner"> -->
+	<nav class="gtco-nav" role="navigation">
+		<div class="gtco-container">
+			<div class="row">
+				<div class="col-sm-4 col-xs-12">
+					<div id="gtco-logo"><a href="Logged_In_Home.html">SP|Air <em>.</em></a></div>
+				</div>
+				<div class="col-xs-8 text-right menu-1">
+					<ul>
+						<li class="active"><a href="Logged_In_Home.html">Book Your Flight</a></li>
+
+						<li class="has-dropdown">
+							<a id="NavUName" href="#"></a>
+							<ul class="dropdown">
+								<li><a href="Logged_In_Profile.html">View Profile</a></li>
+								<li><a href="My_Bookings.html">My Bookings</a></li>
+								<li><a id="Logout" href="index.html" onclick="clearLocal()">Logout</a></li>
+							</ul>
+						</li>
+					</ul>	
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<script>
+		//Retrieve User Data from Local Storage
+		const userData = localStorage.getItem('userInfo')
+		const userJSONData = JSON.parse(userData)
+		var navUname = userJSONData[0].Username
+
+		//Show Username on Nav Bar
+		const listItem = document.querySelector("#NavUName");
+		const newItem = document.createElement('li');
+		newItem.innerHTML = `<a href="#">${navUname}</a>`;	
+		listItem.parentNode.replaceChild(newItem, listItem);
+	</script>
+	
+	<header id="gtco-header" class="gtco-cover gtco-cover-sm" role="banner" style="background-image: url(images/guillaume-flandre-Nz0vmakLQ2U-unsplash.jpg)">
+		<div class="overlay"></div>
+		<div class="gtco-container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-0 text-left">
+					<div class="row row-mt-15em">
+						<div class="col-md-7 mt-text animate-box" data-animate-effect="fadeInUp">
+							<span class="intro-text-small"></span>
+							<h1>One-Way Flights</h1>	
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<div class="gtco-section border-bottom">
+		<div class="gtco-container">
+			<div class="row">
+				<div class="col-md-12 animate-box" id="Flight_List">	
+					<h3>Available Flights</h3>
+					<div class="gtco-contact-info">
+						<div id="AddFlightsTableWrapper" class="table-wrapper disable-select" style="margin-top: 0px; width: 1100px; width: auto; max-height: 750px;">
+							<table class="fl-table" style="table-layout: auto;">
+								<thead>
+								<tr>
+									<th style="width: auto;">Flight Code</th>
+									<th style="width: auto;">Aircraft</th>
+									<th style="width: auto;">Origin Airport</th>
+									<th style="width: auto;">Destination Airport</th>
+									<th style="width: auto;">Duration</th>
+									<th style="width: auto;">Price</th>
+								</tr>
+								</thead>
+								<tbody id="FlightsTable"><tbody>
+							</table>
+						</div>
+					</div>				
+				</div>
+
+				<div class="col-md-6 hidden_row" id="PassForm" style="margin-top: 50px;">
+					<div class="animate-box" id="FormWrapper">
+					<h3>Passenger Information</h3>
+					<label id="SuccessMsg"></label>
+					<form action="#">
+						<div>
+							<div class="col-md-12" style="padding-left: 0;">
+								<label>Full Name</label>
+								<input type="text" id="CustomersName" class="form-control" placeholder="Full Name" required>
+							</div>
+						</div>	
+			
+						<div>
+							<div class="col-md-12" style="padding-left: 0; margin-top: 15px;">
+								<label for="PassportNum">Passport No.</label>
+								<input type="text" oninput="this.value = this.value.toUpperCase()" maxlength="9" id="PassportNum" class="form-control" placeholder="Passport No." required>				
+							</div>
+						</div>	
+			
+						<div>
+							<div class="col-md-12" style="padding-left: 0; margin-top: 15px;">
+								<label for="Nationality">Nationality</label>
+								<select name="nationality" id="nationality" class="form-control">
+									<option value="" disabled selected>Select Nationality</option>
+									<option value="afghan">Afghan</option>
+									<option value="albanian">Albanian</option>
+									<option value="algerian">Algerian</option>
+									<option value="american">American</option>
+									<option value="andorran">Andorran</option>
+									<option value="angolan">Angolan</option>
+									<option value="antiguans">Antiguans</option>
+									<option value="argentinean">Argentinean</option>
+									<option value="armenian">Armenian</option>
+									<option value="australian">Australian</option>
+									<option value="austrian">Austrian</option>
+									<option value="azerbaijani">Azerbaijani</option>
+									<option value="bahamian">Bahamian</option>
+									<option value="bahraini">Bahraini</option>
+									<option value="bangladeshi">Bangladeshi</option>
+									<option value="barbadian">Barbadian</option>
+									<option value="barbudans">Barbudans</option>
+									<option value="batswana">Batswana</option>
+									<option value="belarusian">Belarusian</option>
+									<option value="belgian">Belgian</option>
+									<option value="belizean">Belizean</option>
+									<option value="beninese">Beninese</option>
+									<option value="bhutanese">Bhutanese</option>
+									<option value="bolivian">Bolivian</option>
+									<option value="bosnian">Bosnian</option>
+									<option value="brazilian">Brazilian</option>
+									<option value="british">British</option>
+									<option value="bruneian">Bruneian</option>
+									<option value="bulgarian">Bulgarian</option>
+									<option value="burkinabe">Burkinabe</option>
+									<option value="burmese">Burmese</option>
+									<option value="burundian">Burundian</option>
+									<option value="cambodian">Cambodian</option>
+									<option value="cameroonian">Cameroonian</option>
+									<option value="canadian">Canadian</option>
+									<option value="cape verdean">Cape Verdean</option>
+									<option value="central african">Central African</option>
+									<option value="chadian">Chadian</option>
+									<option value="chilean">Chilean</option>
+									<option value="chinese">Chinese</option>
+									<option value="colombian">Colombian</option>
+									<option value="comoran">Comoran</option>
+									<option value="congolese">Congolese</option>
+									<option value="costa rican">Costa Rican</option>
+									<option value="croatian">Croatian</option>
+									<option value="cuban">Cuban</option>
+									<option value="cypriot">Cypriot</option>
+									<option value="czech">Czech</option>
+									<option value="danish">Danish</option>
+									<option value="djibouti">Djibouti</option>
+									<option value="dominican">Dominican</option>
+									<option value="dutch">Dutch</option>
+									<option value="east timorese">East Timorese</option>
+									<option value="ecuadorean">Ecuadorean</option>
+									<option value="egyptian">Egyptian</option>
+									<option value="emirian">Emirian</option>
+									<option value="equatorial guinean">Equatorial Guinean</option>
+									<option value="eritrean">Eritrean</option>
+									<option value="estonian">Estonian</option>
+									<option value="ethiopian">Ethiopian</option>
+									<option value="fijian">Fijian</option>
+									<option value="filipino">Filipino</option>
+									<option value="finnish">Finnish</option>
+									<option value="french">French</option>
+									<option value="gabonese">Gabonese</option>
+									<option value="gambian">Gambian</option>
+									<option value="georgian">Georgian</option>
+									<option value="german">German</option>
+									<option value="ghanaian">Ghanaian</option>
+									<option value="greek">Greek</option>
+									<option value="grenadian">Grenadian</option>
+									<option value="guatemalan">Guatemalan</option>
+									<option value="guinea-bissauan">Guinea-Bissauan</option>
+									<option value="guinean">Guinean</option>
+									<option value="guyanese">Guyanese</option>
+									<option value="haitian">Haitian</option>
+									<option value="herzegovinian">Herzegovinian</option>
+									<option value="honduran">Honduran</option>
+									<option value="hungarian">Hungarian</option>
+									<option value="icelander">Icelander</option>
+									<option value="indian">Indian</option>
+									<option value="indonesian">Indonesian</option>
+									<option value="iranian">Iranian</option>
+									<option value="iraqi">Iraqi</option>
+									<option value="irish">Irish</option>
+									<option value="israeli">Israeli</option>
+									<option value="italian">Italian</option>
+									<option value="ivorian">Ivorian</option>
+									<option value="jamaican">Jamaican</option>
+									<option value="japanese">Japanese</option>
+									<option value="jordanian">Jordanian</option>
+									<option value="kazakhstani">Kazakhstani</option>
+									<option value="kenyan">Kenyan</option>
+									<option value="kittian and nevisian">Kittian and Nevisian</option>
+									<option value="kuwaiti">Kuwaiti</option>
+									<option value="kyrgyz">Kyrgyz</option>
+									<option value="laotian">Laotian</option>
+									<option value="latvian">Latvian</option>
+									<option value="lebanese">Lebanese</option>
+									<option value="liberian">Liberian</option>
+									<option value="libyan">Libyan</option>
+									<option value="liechtensteiner">Liechtensteiner</option>
+									<option value="lithuanian">Lithuanian</option>
+									<option value="luxembourger">Luxembourger</option>
+									<option value="macedonian">Macedonian</option>
+									<option value="malagasy">Malagasy</option>
+									<option value="malawian">Malawian</option>
+									<option value="malaysian">Malaysian</option>
+									<option value="maldivan">Maldivan</option>
+									<option value="malian">Malian</option>
+									<option value="maltese">Maltese</option>
+									<option value="marshallese">Marshallese</option>
+									<option value="mauritanian">Mauritanian</option>
+									<option value="mauritian">Mauritian</option>
+									<option value="mexican">Mexican</option>
+									<option value="micronesian">Micronesian</option>
+									<option value="moldovan">Moldovan</option>
+									<option value="monacan">Monacan</option>
+									<option value="mongolian">Mongolian</option>
+									<option value="moroccan">Moroccan</option>
+									<option value="mosotho">Mosotho</option>
+									<option value="motswana">Motswana</option>
+									<option value="mozambican">Mozambican</option>
+									<option value="namibian">Namibian</option>
+									<option value="nauruan">Nauruan</option>
+									<option value="nepalese">Nepalese</option>
+									<option value="new zealander">New Zealander</option>
+									<option value="ni-vanuatu">Ni-Vanuatu</option>
+									<option value="nicaraguan">Nicaraguan</option>
+									<option value="nigerien">Nigerien</option>
+									<option value="north korean">North Korean</option>
+									<option value="northern irish">Northern Irish</option>
+									<option value="norwegian">Norwegian</option>
+									<option value="omani">Omani</option>
+									<option value="pakistani">Pakistani</option>
+									<option value="palauan">Palauan</option>
+									<option value="panamanian">Panamanian</option>
+									<option value="papua new guinean">Papua New Guinean</option>
+									<option value="paraguayan">Paraguayan</option>
+									<option value="peruvian">Peruvian</option>
+									<option value="polish">Polish</option>
+									<option value="portuguese">Portuguese</option>
+									<option value="qatari">Qatari</option>
+									<option value="romanian">Romanian</option>
+									<option value="russian">Russian</option>
+									<option value="rwandan">Rwandan</option>
+									<option value="saint lucian">Saint Lucian</option>
+									<option value="salvadoran">Salvadoran</option>
+									<option value="samoan">Samoan</option>
+									<option value="san marinese">San Marinese</option>
+									<option value="sao tomean">Sao Tomean</option>
+									<option value="saudi">Saudi</option>
+									<option value="scottish">Scottish</option>
+									<option value="senegalese">Senegalese</option>
+									<option value="serbian">Serbian</option>
+									<option value="seychellois">Seychellois</option>
+									<option value="sierra leonean">Sierra Leonean</option>
+									<option value="singaporean">Singaporean</option>
+									<option value="slovakian">Slovakian</option>
+									<option value="slovenian">Slovenian</option>
+									<option value="solomon islander">Solomon Islander</option>
+									<option value="somali">Somali</option>
+									<option value="south african">South African</option>
+									<option value="south korean">South Korean</option>
+									<option value="spanish">Spanish</option>
+									<option value="sri lankan">Sri Lankan</option>
+									<option value="sudanese">Sudanese</option>
+									<option value="surinamer">Surinamer</option>
+									<option value="swazi">Swazi</option>
+									<option value="swedish">Swedish</option>
+									<option value="swiss">Swiss</option>
+									<option value="syrian">Syrian</option>
+									<option value="taiwanese">Taiwanese</option>
+									<option value="tajik">Tajik</option>
+									<option value="tanzanian">Tanzanian</option>
+									<option value="thai">Thai</option>
+									<option value="togolese">Togolese</option>
+									<option value="tongan">Tongan</option>
+									<option value="trinidadian or tobagonian">Trinidadian or Tobagonian</option>
+									<option value="tunisian">Tunisian</option>
+									<option value="turkish">Turkish</option>
+									<option value="tuvaluan">Tuvaluan</option>
+									<option value="ugandan">Ugandan</option>
+									<option value="ukrainian">Ukrainian</option>
+									<option value="uruguayan">Uruguayan</option>
+									<option value="uzbekistani">Uzbekistani</option>
+									<option value="venezuelan">Venezuelan</option>
+									<option value="vietnamese">Vietnamese</option>
+									<option value="welsh">Welsh</option>
+									<option value="yemenite">Yemenite</option>
+									<option value="zambian">Zambian</option>
+									<option value="zimbabwean">Zimbabwean</option>
+								</select>							
+							</div>
+						</div>	
+			
+						<div>
+							<div class="col-md-12" style="padding-left: 0; margin-top: 15px;">
+								<label for="Age">Age</label>
+								<input type="number" maxlength="3" id="Age" class="form-control" min="1" placeholder="Age" required>				
+							</div>
+						</div>	
+			
+						<div class="col-md-3 form-group" style="margin-top: 20px; padding-left: 0;">
+							<input id="PISubmit_btn" type="submit" class="btn btn-primary" style="padding: 9.5px; padding-right: 40px; padding-left: 40px;" value="Confirm">
+						</div>
+					</form>	
+					</div>	
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer id="gtco-footer" role="contentinfo">
+		<div class="gtco-container">
+			<div class="row row-p	b-md">
+
+				<div class="col-md-4">
+					<div class="gtco-widget">
+						<h3>About Us</h3>
+						<p>We are an airlines forged by the great Duncan, he is our lord and saviour and our best pilot in the fleet. Borned from the heavens, he is gilded with the best intuition with safety being his number one priority. All hail the great Duncan!</p>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>      </h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">      </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">   </a></li>
+							<li><a href="#">     </a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Promotions</h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">Europe</a></li>
+							<li><a href="#">Asia</a></li>
+							<li><a href="#">America</a></li>
+							<li><a href="#">Canada</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-3 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Get In Touch</h3>
+						<ul class="gtco-quick-contact">
+							<li><a href="#"><i class="icon-phone"></i> +1 234 567 890</a></li>
+							<li><a href="#"><i class="icon-mail2"></i> info@freehtml5.co</a></li>
+							<li><a href="#"><i class="icon-chat"></i> Live Chat</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="row copyright">
+				<div class="col-md-12">
+					<p class="pull-left">
+						<small class="block">&copy; 2016 Free HTML5. All Rights Reserved.</small> 
+						<small class="block">Designed by <a href="https://freehtml5.co/" target="_blank">FreeHTML5.co</a> Demo Images: <a href="http://unsplash.com/" target="_blank">Unsplash</a></small>
+					</p>
+					<p class="pull-right">
+						<ul class="gtco-social-icons pull-right">
+							<li><a href="#"><i class="icon-twitter"></i></a></li>
+							<li><a href="#"><i class="icon-facebook"></i></a></li>
+							<li><a href="#"><i class="icon-linkedin"></i></a></li>
+							<li><a href="#"><i class="icon-dribbble"></i></a></li>
+						</ul>
+					</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- </div> -->
+
+	</div>
+
+	<div class="gototop js-top">
+		<a href="#" class="js-gotop"><i class="icon-arrow-up"></i></a>
+	</div>
+	
+	<!-- jQuery -->
+	<script src="js/jquery.min.js"></script>
+	<!-- jQuery Easing -->
+	<script src="js/jquery.easing.1.3.js"></script>
+	<!-- Bootstrap -->
+	<script src="js/bootstrap.min.js"></script>
+	<!-- Waypoints -->
+	<script src="js/jquery.waypoints.min.js"></script>
+	<!-- Carousel -->
+	<script src="js/owl.carousel.min.js"></script>
+	<!-- countTo -->
+	<script src="js/jquery.countTo.js"></script>
+
+	<!-- Stellar Parallax -->
+	<script src="js/jquery.stellar.min.js"></script>
+
+	<!-- Magnific Popup -->
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/magnific-popup-options.js"></script>
+	
+	<!-- Datepicker -->
+	<script src="js/bootstrap-datepicker.min.js"></script>
+	
+
+	<!-- Main -->
+	<script src="js/main.js"></script>
+
+	</body>
+</html>
+

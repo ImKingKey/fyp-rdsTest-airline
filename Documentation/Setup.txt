@@ -1,0 +1,30 @@
+ --<< Setting Up Instructions >>--
+
+<< Installations >> 
+1. Install Express - Using the Command: 'npm install express'
+2. Install Nodemon - Using the Command: 'npm install nodemon'
+3. Install Multer - Using the Command: 'npm install multer'
+4. Install Path - Using the Command: 'npm install path'
+5. Install fs - Using the Command: 'npm install fs'
+6. Install Moment - Using the Command: 'npm install moment'
+
+
+<< Database Setup >>
+1. Launch MySQL Workbench
+2. Select & Open your Database Connection
+3. Click the 'File' Tab --> Click 'Open SQL Script'
+4. Navigate through 'DuncanLimQingRong_P2136785_DISM2A01' --> 'Backend' --> 'Database.sql'
+5. Select & Open 'Database.sql'
+6. Run the SQL script by Clicking the 'Lightning' Icon Under the File Selection Pane
+
+<< Run Backend Server >>
+1. Open the 'DuncanLimQingRong_P2136785_DISM2A01' in Visual Studio Code
+2. Expand the 'Backend' Folder --> Right Click the 'Server' Folder --> Click 'Open in Integrated Terminal'
+3. In Terminal, Type 'nodemon Server.js'
+
+<< Run Frontend Server >>
+1. Open the 'DuncanLimQingRong_P2136785_DISM2A01' in Visual Studio Code
+2. Right Click the 'Frontend' Folder --> Click 'Open in Integrated Terminal'
+3. In Terminal, Type 'nodemon index.js'
+4. In Terminal, hold 'Ctrl' and Click the Link 'http://localhost:3001'
+5. Start Browsing

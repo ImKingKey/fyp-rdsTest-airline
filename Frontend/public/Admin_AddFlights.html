@@ -1,0 +1,790 @@
+<!DOCTYPE HTML>
+<!--
+	Name: Duncan Lim Qing Rong
+	Class: DISM/FT/2A/01
+	Admin Number: P2136785
+-->
+
+<!--
+	Traveler by freehtml5.co
+	Twitter: http://twitter.com/fh5co
+	URL: http://freehtml5.co
+-->
+<html>
+	<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SP|Air &mdash; Duncan's BED CA2 &mdash; DISM2A01.org</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<meta name="description" content="Free HTML5 Website Template by FreeHTML5.co" />
+	<meta name="keywords" content="free website templates, free html5, free template, free bootstrap, free website template, html5, css3, mobile first, responsive" />
+	<meta name="author" content="FreeHTML5.co" />
+
+  	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content=""/>
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content=""/>
+	<meta property="og:description" content=""/>
+	<meta name="twitter:title" content="" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="" />
+
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="css/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="css/icomoon.css">
+	<!-- Themify Icons-->
+	<link rel="stylesheet" href="css/themify-icons.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="css/bootstrap.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/magnific-popup.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
+
+	<!-- Owl Carousel  -->
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+
+	<!-- Theme style  -->
+	<link rel="stylesheet" href="css/style.css">
+	
+	<!-- Icons -->
+	<script src="https://kit.fontawesome.com/4d486d1312.js" crossorigin="anonymous"></script>
+
+	<!-- Modernizr JS -->
+	<script src="js/modernizr-2.6.2.min.js"></script>
+	<!-- FOR IE9 below -->
+	<!--[if lt IE 9]>
+	<script src="js/respond.min.js"></script>
+	<![endif]-->
+	<!-------------------------------------------------------------------------------------------->
+	<script>
+		function clearLocal() {
+			localStorage.clear();
+		}
+	</script>
+	
+	<script>  
+			$(document).ready(function () {  
+				const userData = localStorage.getItem('userInfo')
+				const userJSONData = JSON.parse(userData)
+				const FlightInfo = sessionStorage.getItem('FlightsList')
+				const FlightJSONInfo = JSON.parse(FlightInfo)
+
+				//--------------------------Update Handler----------------------------
+				$("#Create_btn").click(function () {  
+				var tmpOrigin = $('#OAirport').val();
+				var tmpDest = $('#DAirport').val();
+
+				//Date & Time
+				var tmpDepDT = $('#date-start').val()
+				var tmpArrDT = $('#date-arrive').val()
+
+
+				//Duration
+				var tmpHours = $('#Hours').val()
+				var tmpMins = $('#Minutes').val()
+				var Duration = '' + tmpHours + ' Hours(s)' +' '+ tmpMins + ' Min(s)'
+				
+				//Price
+				var tmpPrice = $('#price').val().toString()
+				var Price = ''
+
+				if (tmpPrice.indexOf(',') > -1) { 
+					var splitArray = tmpPrice.split(',') 
+					
+					for (let i = 0; i < splitArray.length; i++) {
+						Price += splitArray[i]
+					}
+					Price = Price.slice(1)
+				}
+				
+
+				//Aircraft
+				var tmpAircraft = $('#aircraft').val()
+
+				//Fight Code
+				var lastFlight = FlightJSONInfo.length
+				var lastFCode = FlightJSONInfo[lastFlight - 1].FlightCode
+				var splitArray = lastFCode.split('SP')
+				var tmpFlightCode = 'SP' + (parseInt(splitArray[1]) + 1) 
+				
+				console.log(tmpFlightCode,'.'+ tmpOrigin, '.'+tmpDest, '.'+tmpDepDT, '.'+tmpArrDT, '.'+Duration, '.'+Price, '.'+tmpAircraft)
+
+				//Token
+				var tmpToken = localStorage.getItem('token');
+
+				if (tmpFlightCode == null || tmpOrigin == null || tmpDest == null || tmpDepDT == undefined || tmpArrDT == undefined || Duration == undefined || isNaN(Price) || tmpAircraft == '' || tmpFlightCode == '' || tmpOrigin == '' || tmpDest == '' || tmpDepDT == '' || tmpArrDT == '' || Duration == '' || Price == '' || tmpAircraft == undefined || tmpFlightCode == undefined || tmpOrigin == undefined || tmpDest == undefined || tmpDepDT == null || tmpArrDT == null || Duration == null || Price == null || tmpAircraft == null) {
+					alert('Failed to Add Flight - Please Fill Required Fields')
+				
+				} else {
+					var data = "{\"FlightCode\":\""+tmpFlightCode+"\", \"Aircraft\":\""+tmpAircraft+"\", \"OriginAirport\":\""+tmpOrigin+"\", \"DestinationAirport\":\""+tmpDest+"\", \"EmbarkDate\":\""+tmpDepDT+"\", \"ArrivalDate\":\""+tmpArrDT+"\", \"TravelTime\":\""+Duration+"\", \"Price\":\""+Price+"\"}"; 
+
+					$.ajax({   
+						headers: {'authorization': 'Bearer '+ tmpToken},     
+						url: 'http://localhost:8081/api/flight',  
+						type: 'POST',
+						data: data,  
+						contentType: "application/json; charset=utf-8",
+						dataType: 'json',  
+						success: function (data, textStatus, xhr) { 
+							alert('Flight Added Successfully')    
+							location.reload()              
+						},  
+						error: function (xhr, textStatus, errorThrown) { 
+							$("#SuccessMsg").replaceWith(`<label style="color: rgba(255, 0, 0, 0.552); font-weight: 400;">Failed to Add Flight - Please Enter Valid Values</label>`)
+							console.log('Error in Operation');  
+							console.log(JSON.stringify(xhr))
+							console.log(textStatus)
+							console.log(JSON.stringify(errorThrown))
+						}  
+					})
+				}
+					return false
+				});  
+
+				$("#Logout").click(function () {
+					localStorage.clear();
+					window.location.assign("http://localhost:3001/login.html");
+				})
+			})
+	</script> 
+
+	<!--Function to Expand Flight Details-->
+	<script>
+		$(document).ready(function() {
+			// Click handler on entire table
+			$(".ExpandDetails").on('click', function(event) {
+				console.log('clicked')
+				id = $(this).closest('td').parent()[0].sectionRowIndex;
+				document.getElementById(`hidden_row${id}`).style.display = 'block';
+			});
+		})
+	</script>
+
+	<script type="text/javascript">
+		function showHideRow(row) {
+			$(row).toggle(300);
+		}
+	</script>
+
+	<script>
+		function getDateAndTime (Timestamp){
+
+			var d = new Date(Timestamp);
+			d.getUTCFullYear();
+			d.getUTCMonth();
+			d.getUTCDate();
+			d.getUTCHours();
+			d.getUTCMinutes();
+			d.getUTCSeconds()
+			return(d.toUTCString())
+		}
+	</script>
+
+	<!-------------Origin Airport Selection Filler-------------->
+	<script>
+		$(document).ready(function() {
+
+			$.ajax({
+				url: 'http://localhost:8081/api/airport',
+				type: 'GET',
+				contentType: "application/json;",
+				dataType: 'json',
+				success: function (data, textStatus, xhr) {
+
+					if (data != null) {
+						sessionStorage.setItem("AirportList", JSON.stringify(data))
+						console.log('GET Success [Airport]')
+						var Airports = sessionStorage.getItem("AirportList")
+						var AirportsJSONData = JSON.parse(Airports)
+
+						for(let i = 0; i < AirportsJSONData.length; i++) {
+							document.getElementById("OAirport").innerHTML += `<option value='${AirportsJSONData[i].AirportID}'>${AirportsJSONData[i].Name}</option>`
+						
+						}
+
+					} else {
+						console.log('GET Failure')
+					}
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					console.log('Error in Operation');  
+					console.log(JSON.stringify(xhr))
+					console.log(textStatus)
+					console.log(JSON.stringify(errorThrown))
+				}
+			})
+
+			return false
+		})
+	</script>
+
+	<!-------------Destination Airport Selection Filler-------------->
+	<script>
+		$(document).ready(function() {
+			setTimeout(function() {
+				var AirportLst = sessionStorage.getItem("AirportList")
+				var AirportJSONData = JSON.parse(AirportLst)
+
+				for(let i = 0; i < AirportJSONData.length; i++) {
+					document.getElementById("DAirport").innerHTML += `<option value='${AirportJSONData[i].AirportID}'>${AirportJSONData[i].Name}</option>`
+			}
+
+			}, 1000)
+
+			return false
+		})
+	</script>
+
+	<!------------------Flights Table Filler----------------->
+	<script>
+		$(document).ready(function() {
+
+			$.ajax({
+				url: 'http://localhost:8081/api/flights',
+				type: 'GET',
+				contentType: "application/json;",
+				dataType: 'json',
+				success: function (data, textStatus, xhr) {
+
+					if (data != null) {
+						sessionStorage.setItem("FlightsList", JSON.stringify(data))
+						console.log('GET Success [Flights]')
+						var Flights = sessionStorage.getItem("FlightsList")
+						var FlightsJSONData = JSON.parse(Flights)
+
+						var postHTML = ''
+					
+						for(let i = 0; i < FlightsJSONData.length; i++) {
+
+							postHTML += 	`<tr onclick=showHideRow(hidden_row${i})>
+												<td style="width: auto;">${FlightsJSONData[i].FlightID}</td>
+												<td style="width: auto;">${FlightsJSONData[i].Aircraft}</td>
+												<td style="width: auto;">${FlightsJSONData[i].OriginAirport}</td>
+												<td style="width: auto;">${FlightsJSONData[i].DestinationAirport}</td>
+												<td style="width: auto;">${FlightsJSONData[i].TravelTime}</td>
+												<td style="width: auto;">$${FlightsJSONData[i].Price.toFixed(2)}</td>
+											</tr>
+																							
+											<tr id='hidden_row${i}' class='hidden_row'>
+												<td colspan=6>
+													<div>
+														<h4 class='col-xs-12' style='margin-top: 14px; font-weight: 500; color: black;'>Flight Details  [${FlightsJSONData[i].FlightID}]</h4>
+														<h5 class='col-xs-12' style='font-weight:500; color: black;'>Flight Code: ${FlightsJSONData[i].FlightCode}</h5>
+														<div style = 'margin-top: 10px;'>
+															<i class='fas fa-plane-departure col-xs-1' style='font-size:20px; padding-right: 0px;'></i>
+															<h5 class='col-xs-2' style = 'padding-left: 0px'>${FlightsJSONData[i].OriginAirport}</h5>
+															<h5 class='col-xs-3' style = 'padding-left: 0px'>${getDateAndTime(FlightsJSONData[i].EmbarkDate)}</h5>
+															
+															<i class="fa-regular fa-clock col-xs-1" style='font-size:20px; padding-right: 0px; font-weight: 600; margin-bottom: 5px;'></i>
+															<h5 class='col-xs-1' style = 'padding-left: 0px'>Duration:</h5>
+															<h5 class='col-xs-4' style='padding-left: 0px;'>${FlightsJSONData[i].TravelTime}</h5>
+
+															<i class='fas fa-plane-arrival col-xs-1' style='font-size:20px; padding-right: 0px;'></i>
+															<h5 class='col-xs-2' style='padding-left: 0px'>${FlightsJSONData[i].DestinationAirport}</h5>
+															<h5 class='col-xs-3' style = 'padding-left: 0px'>${getDateAndTime(FlightsJSONData[i].ArrivalDate)}</h5>
+
+															<i class="fa-regular fa-dollar-sign col-xs-1" style='font-size:20px; padding-right: 0px; font-weight: 600; margin-left: 4px'></i>
+															<h5 class='col-xs-1' style = 'padding-left: 0px'>Price:</h5>
+															<h5 class='col-xs-3' style='padding-left: 0px;'>$${FlightsJSONData[i].Price.toFixed(2)}</h5>
+														</div>
+												</td>
+											</tr>
+											`
+						}
+
+						$('#FlightsTable').append(postHTML)
+					} else {
+						console.log('GET Failure [Flights]')
+					}
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					console.log('Error in Operation');  
+					console.log(JSON.stringify(xhr))
+					console.log(textStatus)
+					console.log(JSON.stringify(errorThrown))
+				}
+			})
+
+			return false
+		})
+	</script>
+
+	<!----------------------Script To Handle Currency Input Box---------------------->
+	<script>
+		$(document).ready(function() {
+
+			$("input[data-type='currency']").on({keyup: function() {
+
+					formatCurrency($(this));
+					},
+					blur: function() { 
+					formatCurrency($(this), "blur");
+					}
+				});
+
+
+				function formatNumber(n) {
+				// format number 1000000 to 1,234,567
+				console.log(n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","))
+				return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+				}
+
+
+				function formatCurrency(input, blur) {
+				// appends $ to value, validates decimal side
+				// and puts cursor back in right position.
+				
+				// get input value
+				var input_val = input.val();
+				
+				// don't validate empty input
+				if (input_val === "") { return; }
+				
+				// original length
+				var original_len = input_val.length;
+
+				// initial caret position 
+				var caret_pos = input.prop("selectionStart");
+					
+				// check for decimal
+				if (input_val.indexOf(".") >= 0) {
+
+					// get position of first decimal
+					// this prevents multiple decimals from
+					// being entered
+					var decimal_pos = input_val.indexOf(".");
+
+					// split number by decimal point
+					var left_side = input_val.substring(0, decimal_pos);
+					var right_side = input_val.substring(decimal_pos);
+
+					// add commas to left side of number
+					left_side = formatNumber(left_side);
+
+					// validate right side
+					right_side = formatNumber(right_side);
+					
+					// On blur make sure 2 numbers after decimal
+					if (blur === "blur") {
+					right_side += "00";
+					}
+					
+					// Limit decimal to only 2 digits
+					right_side = right_side.substring(0, 2);
+
+					// join number by .
+					input_val = "$" + left_side + "." + right_side;
+
+				} else {
+					// no decimal entered
+					// add commas to number
+					// remove all non-digits
+					input_val = formatNumber(input_val);
+					input_val = "$" + input_val;
+					
+					// final formatting
+					if (blur === "blur") {
+					input_val += ".00";
+					}
+				}
+				
+				// send updated string to input
+				input.val(input_val);
+
+				// put caret back in the right position
+				var updated_len = input_val.length;
+				caret_pos = updated_len - original_len + caret_pos;
+				input[0].setSelectionRange(caret_pos, caret_pos);
+			}
+		})
+	</script>
+	</head>
+	<body>
+		
+	<div class="gtco-loader"></div>
+	
+	<div id="page">
+
+	
+	<!-- <div class="page-inner"> -->
+		<nav class="gtco-nav" role="navigation">
+			<div class="gtco-container">
+				
+				<div class="row">
+					<div class="col-sm-2 col-xs-12">
+						<div id="gtco-logo"><a href="Admin_Home.html">SP|Air <em>.</em></a></div>
+					</div>
+					<div class="col-xs-10 text-right menu-1">
+						<ul>
+							<li class="has-dropdown active">
+								<a href="#">Manage Flights</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddFlights.html">Add Flight</a></li>
+									<li><a href="Admin_DeleteFlights.html">Delete Flights</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a href="#">Manage Users</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddUsers.html">Add Users</a></li>
+									<li><a href="Admin_DeleteUsers.html">Delete Users</a></li>
+									<li><a href="Admin_UpdateUsers.html">Update Users Information</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a href="#">Manage Bookings</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddBooking.html">Add Bookings</a></li>
+									<li><a href="Admin_DeleteBookings.html">Delete Bookings</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a href="#">Manage Airports</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddAirport.html">Add Airports</a></li>
+									<li><a href="Admin_DeleteAirport.html">Delete Airports</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a href="#">Manage Promotions</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddPromo.html">Add Promotions</a></li>
+									<li><a href="Admin_DeletePromo.html">Delete Promotions</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a id="NavUName" href="#"></a>
+								<ul class="dropdown">
+									<li><a href="Admin_Profile.html">View Profile</a></li>
+									<li><a id="Logout" href="index.html" onclick="clearLocal()">Logout</a></li>
+								</ul>
+							</li>
+						</ul>	
+					</div>
+				</div>
+				
+			</div>
+		</nav>
+
+	<script>
+		//Retrieve User Data from Local Storage
+		const userData = localStorage.getItem('userInfo')
+		const userJSONData = JSON.parse(userData)
+		var navUname = userJSONData[0].Username
+
+		//Show Username on Nav Bar
+		const listItem = document.querySelector("#NavUName");
+		const newItem = document.createElement('li');
+		newItem.innerHTML = `<a href="#">${navUname}</a>`;	
+		listItem.parentNode.replaceChild(newItem, listItem);
+	</script>
+	
+	<header id="gtco-header" class="gtco-cover gtco-cover-md" role="banner" style="background-image: url(images/patrick-tomasso-j1dj50Td7CQ-unsplash.jpg); max-height: 700px;">
+		<div class="overlay"></div>
+		<div class="gtco-container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-0 text-center">
+					<div class="row row-mt-15em">
+						<div class="col-md-12 mt-text animate-box" data-animate-effect="fadeInUp">
+							<h1>Add Flights</h1>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<div class="gtco-section border-bottom">
+		<div class="gtco-container">
+			<div class="row">
+
+				<script
+				src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+				integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+				crossorigin="anonymous"
+				referrerpolicy="no-referrer"
+				></script>
+
+				<script>
+					$(document).ready(function () {
+
+						var fields = document.getElementsByClassName("validated-field")
+
+						if (Array.from(fields).length > 0) {
+							Array.from(fields).forEach(field => {
+								field.addEventListener("input", function(e) {
+						
+								if (!e.target.value) {
+									e.target.classList.add("not-valid")
+									
+								} else {
+									e.target.classList.remove("not-valid")
+
+									var startDate = document.getElementById("date-start").value;
+									var endDate = document.getElementById("date-arrive").value;
+
+									//Embark Date
+									var dateStmp = Date.parse(startDate)
+
+									//Arrival Date
+									var dateEtmp = Date.parse(endDate)
+
+									//Time Difference in Milliseconds 
+									var timediff = dateEtmp - dateStmp
+
+									//Function to calculate time difference in Hours & Minutes
+									function CalcTimeDiff (DifferenceInMS) {
+										var diffDays = Math.floor(DifferenceInMS / 86400000); // days
+										var daysInHours = diffDays * 24
+										var diffHrs = Math.floor((DifferenceInMS % 86400000) / 3600000); // hours
+										var diffMins = Math.round(((DifferenceInMS % 86400000) % 3600000) / 60000); // minutes
+										return [daysInHours + diffHrs, diffMins]
+									}
+
+									var TimedDifference = CalcTimeDiff(timediff)
+
+									if (parseInt(TimedDifference[0]) < 0 || parseInt(TimedDifference[1]) < 0) {
+										var EmbarkInput = document.getElementById('date-start')
+										var ArriveInput = document.getElementById('date-arrive')
+
+										$("#SuccessMsg").replaceWith(`<label style="color: rgba(255, 0, 0, 0.552); font-weight: 400;">Date & Time Conflict - Please Enter Valid Dates & Time</label>`)
+										EmbarkInput.classList.add("not-valid")
+										ArriveInput.classList.add("not-valid")
+
+									} else {
+										var EmbarkInput = document.getElementById('date-start')
+										var ArriveInput = document.getElementById('date-arrive')
+
+										document.getElementById('Hours').value = TimedDifference[0]
+										document.getElementById('Minutes').value = TimedDifference[1]
+										EmbarkInput.classList.remove("not-valid")
+										ArriveInput.classList.remove("not-valid")
+									}
+
+									}
+								})
+							})
+						}
+					})
+
+				</script>
+
+				<div class="col-md-12 animate-box" style="padding: 0;">	
+					<div class="gtco-contact-info">
+						<h3>Flights Table</h3>
+						<div id="AddFlightsTableWrapper" class="table-wrapper disable-select" style="margin-top: 0px; width: 1100px; width: auto;">
+							<table class="fl-table" style="table-layout: auto;">
+								<thead>
+								<tr>
+									<th style="width: auto;">Flight ID</th>
+									<th style="width: auto;">Aircraft</th>
+									<th style="width: auto;">Origin Airport</th>
+									<th style="width: auto;">Destination Airport</th>
+									<th style="width: auto;">Duration</th>
+									<th style="width: auto;">Price</th>
+								</tr>
+
+								</thead>
+								<tbody id="FlightsTable"><tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-md-12" style="padding-left: 0; margin-top: 20px">
+					<div class="animate-box" id="FormWrapper">
+					<h3>Flight Details</h3>
+					<label id="SuccessMsg"></label>
+					<form action="#" class="col-md-8" style="padding-left: 0; margin-top: 20px">
+						<div class="col-md-12" style="padding-left: 0;">
+							<h4 style="text-decoration: underline">Airports</h4>
+							<div class="col-md-6" style="padding-left: 0;">
+								<label for="Origin Airport">Origin Airport</label>
+								<select name="Origin Airport" id="OAirport" class="form-control">
+									<option value="" disabled selected>Select Origin Airport</option>
+								</select>							
+							</div>	
+
+							<div class="col-md-6" style="padding-left: 0;">
+								<label for="Destination Airport">Destination Airport</label>
+								<select name="Destination Airport" id="DAirport" class="form-control">
+									<option value="" disabled selected>Select Destination Airport</option>
+								</select>							
+							</div>
+						</div>
+
+						<div class="col-md-12" style="margin-top: 40px; padding-left: 0;">
+							<h4 style="text-decoration: underline">Date & Time</h4>
+							<div class="col-md-6" style="padding-left: 0;">
+								<label for="date-start">Departure Date & Time</label>
+								<input type="datetime-local" id="date-start" class="form-control validated-field">
+							</div>
+
+							<div class="col-md-6" style="padding-left: 0;">
+								<label for="date-arrive">Arrival Date & Time</label>
+								<input type="datetime-local" id="date-arrive" class="form-control validated-field">
+							</div>
+						</div>
+
+
+						<div class="col-md-12" style="margin-top: 40px; padding-left: 0;">
+							<h4 style="text-decoration: underline">Duration</h4>
+							<div>
+								<div class="col-md-6" style="padding-left: 0;">
+									<label for="Hours">Hour(s)</label>
+									<input type="number" id="Hours" class="form-control" min="1" placeholder="Hour(s)" maxlength="2" disabled required>				
+								</div>
+							</div>
+	
+							<div>
+								<div class="col-md-6" style="padding-left: 0;">
+									<label for="Mins">Min(s)</label>
+									<input type="number" id="Minutes" class="form-control" min="1" placeholder="Min(s)" maxlength="2" disabled required>				
+								</div>
+							</div>	
+						</div>
+
+						<div class="col-md-6" style="margin-top: 40px; padding-left: 0;">
+							<h4 style="text-decoration: underline">Aircraft</h4>
+							<div class="col-md-12" style="padding-left: 0;">
+								<label for="date-start">Aircraft</label>
+								<input type="text" id="aircraft" oninput="this.value = this.value.toUpperCase()" class="form-control" placeholder="Aircraft Model" required>
+							</div>	
+						</div>
+
+						<div class="col-md-6" style="margin-top: 40px; padding-left: 0;">
+							<h4 style="text-decoration: underline">Price</h4>
+							<div class="col-md-12" style="padding-left: 0;">
+								<label for="date-start">Price</label>
+								<input type="text" name="price" id="price" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" data-type="currency" class="form-control" placeholder="Price in SGD [Singapore Dollars]" required>
+							</div>	
+						</div>
+
+						<div class="col-md-12" style="margin-top: 40px; padding-left: 0;">
+							<div class="col-md-4 form-group" style="padding-left: 0;">
+								<input id="Create_btn" type="submit" class="btn btn-primary" style="padding: 9.5px; padding-right: 22px; padding-left: 22px;" value="Add Flight" required>
+							</div>
+						</div>
+					</form>		
+				</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer id="gtco-footer" role="contentinfo">
+		<div class="gtco-container">
+			<div class="row row-p	b-md">
+
+				<div class="col-md-4">
+					<div class="gtco-widget">
+						<h3>About Us</h3>
+						<p>We are an airlines forged by the great Duncan, he is our lord and saviour and our best pilot in the fleet. Borned from the heavens, he is gilded with the best intuition with safety being his number one priority. All hail the great Duncan!</p>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>      </h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">      </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">   </a></li>
+							<li><a href="#">     </a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Promotions</h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">Europe</a></li>
+							<li><a href="#">Asia</a></li>
+							<li><a href="#">America</a></li>
+							<li><a href="#">Canada</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-3 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Get In Touch</h3>
+						<ul class="gtco-quick-contact">
+							<li><a href="#"><i class="icon-phone"></i> +1 234 567 890</a></li>
+							<li><a href="#"><i class="icon-mail2"></i> info@freehtml5.co</a></li>
+							<li><a href="#"><i class="icon-chat"></i> Live Chat</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="row copyright">
+				<div class="col-md-12">
+					<p class="pull-left">
+						<small class="block">&copy; 2016 Free HTML5. All Rights Reserved.</small> 
+						<small class="block">Designed by <a href="https://freehtml5.co/" target="_blank">FreeHTML5.co</a> Demo Images: <a href="http://unsplash.com/" target="_blank">Unsplash</a></small>
+					</p>
+					<p class="pull-right">
+						<ul class="gtco-social-icons pull-right">
+							<li><a href="#"><i class="icon-twitter"></i></a></li>
+							<li><a href="#"><i class="icon-facebook"></i></a></li>
+							<li><a href="#"><i class="icon-linkedin"></i></a></li>
+							<li><a href="#"><i class="icon-dribbble"></i></a></li>
+						</ul>
+					</p>
+				</div>
+			</div>
+
+		</div>
+	</footer>
+	<!-- </div> -->
+
+	</div>
+
+	<div class="gototop js-top">
+		<a href="#" class="js-gotop"><i class="icon-arrow-up"></i></a>
+	</div>
+	
+	<!-- jQuery -->
+	<script src="js/jquery.min.js"></script>
+	<!-- jQuery Easing -->
+	<script src="js/jquery.easing.1.3.js"></script>
+	<!-- Bootstrap -->
+	<script src="js/bootstrap.min.js"></script>
+	<!-- Waypoints -->
+	<script src="js/jquery.waypoints.min.js"></script>
+	<!-- Carousel -->
+	<script src="js/owl.carousel.min.js"></script>
+	<!-- countTo -->
+	<script src="js/jquery.countTo.js"></script>
+
+	<!-- Stellar Parallax -->
+	<script src="js/jquery.stellar.min.js"></script>
+
+	<!-- Magnific Popup -->
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/magnific-popup-options.js"></script>
+	
+	<!-- Datepicker -->
+	<script src="js/bootstrap-datepicker.min.js"></script>
+	
+
+	<!-- Main -->
+	<script src="js/main.js"></script>
+
+	</body>
+</html>
+

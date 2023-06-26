@@ -1,0 +1,721 @@
+<!DOCTYPE HTML>
+<!--
+	Name: Duncan Lim Qing Rong
+	Class: DISM/FT/2A/01
+	Admin Number: P2136785
+-->
+
+<!--
+	Traveler by freehtml5.co
+	Twitter: http://twitter.com/fh5co
+	URL: http://freehtml5.co
+-->
+<html>
+	<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SP|Air &mdash; Duncan's BED CA2 &mdash; DISM2A01.org</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<meta name="description" content="Free HTML5 Website Template by FreeHTML5.co" />
+	<meta name="keywords" content="free website templates, free html5, free template, free bootstrap, free website template, html5, css3, mobile first, responsive" />
+	<meta name="author" content="FreeHTML5.co" />
+
+  	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content=""/>
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content=""/>
+	<meta property="og:description" content=""/>
+	<meta name="twitter:title" content="" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="" />
+
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="css/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="css/icomoon.css">
+	<!-- Themify Icons-->
+	<link rel="stylesheet" href="css/themify-icons.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="css/bootstrap.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/magnific-popup.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
+
+	<!-- Owl Carousel  -->
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+
+	<!-- Theme style  -->
+	<link rel="stylesheet" href="css/style.css">
+
+	<!-- Icons -->
+	<script src="https://kit.fontawesome.com/4d486d1312.js" crossorigin="anonymous"></script>
+
+	<!-- Modernizr JS -->
+	<script src="js/modernizr-2.6.2.min.js"></script>
+	<!-- FOR IE9 below -->
+	<!--[if lt IE 9]>
+	<script src="js/respond.min.js"></script>
+	<![endif]-->
+<!-------------------------------------------------------------------------------------------->
+	<script>
+		function clearLocal() {
+			localStorage.clear();
+		}
+	</script>
+
+	<script>  
+			$(document).ready(function () {  
+				
+				$("#Create_btn").click(function () {  
+				var Promos = sessionStorage.getItem("PromoList")
+				var PromosJSON = JSON.parse(Promos)
+
+				var tmpPromoCode = $('#PromoCode').val();
+				var tmpExpiryDate = $('#Expiry').val();
+				var tmpValue = $('#Value').val();
+				var tmpCondition = $('#Condition').val();
+				
+				var tmpToken = localStorage.getItem('token');
+
+				function CheckName(code) {
+					for(let i = 0; i < PromosJSON.length; i++) {
+
+						if (code == PromosJSON[i].Code) {
+							return true
+						}
+					}
+				}
+
+				if (CheckName(tmpPromoCode) == true) {
+					
+				} else if(tmpPromoCode == null || tmpPromoCode == '' || tmpPromoCode == undefined || tmpExpiryDate == null || tmpExpiryDate == '' || tmpExpiryDate == undefined || tmpValue == null || tmpValue == '' || tmpValue == undefined || tmpCondition == null || tmpCondition == '' || tmpCondition == undefined) {
+					alert(`Failed to Add Promotion - Please Fill Required Fields`)
+				
+				} else {
+					var data = "{\"Code\":\""+tmpPromoCode+"\", \"ExpiryDate\":\""+tmpExpiryDate+"\", \"Value\":\""+tmpValue+"\", \"PromoCondition\":\""+tmpCondition+"\"}"; 
+
+					$.ajax({   
+						headers: {'authorization': 'Bearer '+ tmpToken},     
+						url: `http://localhost:8081/api/promos`,  
+						type: 'POST',
+						data: data,
+						contentType: "application/json",
+						dataType: 'json',  
+						success: function (data, textStatus, xhr) {
+							alert(`Promotion Created Successfully`)  
+							location.reload()
+						},  
+						error: function (xhr, textStatus, errorThrown) { 
+							$("#SuccessMsg").replaceWith(`<label style="color: rgba(255, 0, 0, 0.552); font-weight: 400;">Failed to Create Promotion - Please Enter Valid Values</label>`)
+							console.log('Error in Operation');  
+							console.log(JSON.stringify(xhr))
+							console.log(textStatus)
+							console.log(JSON.stringify(errorThrown))
+						}  
+					})
+				}
+					return false
+				});  
+
+				$("#Logout").click(function () {
+					localStorage.clear();
+					window.location.assign("http://localhost:3001/login.html");
+				})
+			})
+	</script> 
+
+	<script>
+		function getDateAndTime (Timestamp){
+
+			var d = new Date(Timestamp);
+			d.getUTCFullYear();
+			d.getUTCMonth();
+			d.getUTCDate();
+			d.getUTCHours();
+			d.getUTCMinutes();
+			d.getUTCSeconds()
+			return(d.toUTCString())
+		}
+	</script>
+
+	<!-------------Users Table Filler-------------->
+	<script>
+		$(document).ready(function() {
+
+			$.ajax({
+				url: 'http://localhost:8081/api/promos',
+				type: 'GET',
+				contentType: "application/json;",
+				dataType: 'json',
+				success: function (data, textStatus, xhr) {
+
+					if (data != null) {
+						sessionStorage.setItem("PromoList", JSON.stringify(data))
+						console.log('GET Success [Promo List]')
+						var Promos = sessionStorage.getItem("PromoList")
+						var PromosJSON = JSON.parse(Promos)
+
+						for(let i = 0; i < PromosJSON.length; i++) {
+							document.getElementById("PromoTable").innerHTML += `<tr>
+																					<td style="width: 10%;">${PromosJSON[i].PromoID}</th>
+																					<td style="width: auto;">${PromosJSON[i].Code}</th>
+																					<td style="width: 10%;">${PromosJSON[i].Value}</th>
+																					<td style="width: auto;">${getDateAndTime(PromosJSON[i].CreationDate)}</th>
+																					<td style="width: auto;">${getDateAndTime(PromosJSON[i].ExpiryDate)}</th>
+																					<td style="width: auto;">${PromosJSON[i].PromoCondition}</th>
+																				</tr>`
+						}
+
+					} else {
+						console.log('GET Failure [Users]')
+					}
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					console.log('Error in Operation');  
+					console.log(JSON.stringify(xhr))
+					console.log(textStatus)
+					console.log(JSON.stringify(errorThrown))
+				}
+			})
+
+			return false
+		})
+	</script>
+
+	</head>
+	<body>
+		
+	<div class="gtco-loader"></div>
+	
+	<div id="page">
+
+	
+	<!-- <div class="page-inner"> -->
+		<nav class="gtco-nav" role="navigation">
+			<div class="gtco-container">
+				
+				<div class="row">
+					<div class="col-sm-2 col-xs-12">
+						<div id="gtco-logo"><a href="Admin_Home.html">SP|Air <em>.</em></a></div>
+					</div>
+					<div class="col-xs-10 text-right menu-1">
+						<ul>
+							<li class="has-dropdown active">
+								<a href="#">Manage Flights</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddFlights.html">Add Flight</a></li>
+									<li><a href="Admin_DeleteFlights.html">Delete Flights</a></li>
+								</ul>
+							</li>
+
+							<li class="has-dropdown">
+								<a href="#">Manage Users</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddUsers.html">Add Users</a></li>
+									<li><a href="Admin_DeleteUsers.html">Delete Users</a></li>
+									<li><a href="Admin_UpdateUsers.html">Update Users Information</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a href="#">Manage Bookings</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddBooking.html">Add Bookings</a></li>
+									<li><a href="Admin_DeleteBookings.html">Delete Bookings</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a href="#">Manage Airports</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddAirport.html">Add Airports</a></li>
+									<li><a href="Admin_DeleteAirport.html">Delete Airports</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown active">
+								<a href="#">Manage Promotions</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddPromo.html">Add Promotions</a></li>
+									<li><a href="Admin_DeletePromo.html">Delete Promotions</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a id="NavUName" href="#"></a>
+								<ul class="dropdown">
+									<li><a href="Admin_Profile.html">View Profile</a></li>
+									<li><a id="Logout" href="index.html" onclick="clearLocal()">Logout</a></li>
+								</ul>
+							</li>
+						</ul>	
+					</div>
+				</div>
+				
+			</div>
+		</nav>
+
+	<script>
+		//Retrieve User Data from Local Storage
+		const userData = localStorage.getItem('userInfo')
+		const userJSONData = JSON.parse(userData)
+		var navUname = userJSONData[0].Username
+
+		//Show Username on Nav Bar
+		const listItem = document.querySelector("#NavUName");
+		const newItem = document.createElement('li');
+		newItem.innerHTML = `<a href="#">${navUname}</a>`;	
+		listItem.parentNode.replaceChild(newItem, listItem);
+	</script>
+	
+	<header id="gtco-header" class="gtco-cover gtco-cover-md" role="banner" style="background-image: url(images/heidi-fin-2TLREZi7BUg-unsplash.jpg); max-height: 700px;">
+		<div class="overlay"></div>
+		<div class="gtco-container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-0 text-center">
+					<div class="row row-mt-15em">
+						<div class="col-md-12 mt-text animate-box" data-animate-effect="fadeInUp">
+							<h1>Add Promotions</h1>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<div class="gtco-section border-bottom" style="border-right: 1px solid lightgrey !important;">
+		<div class="gtco-container">
+			<div class="row">
+					<div class="col-md-12 animate-box" id="FormWrapper">
+					<h3>Promotion Details</h3>
+					<label id="SuccessMsg"></label>
+					<form action="#">	
+						
+						<div>
+							<div class="col-md-3" style="padding-left: 0;">
+								<label for="date-start">Promo Code</label>
+								<input type="text" id="PromoCode" class="form-control" placeholder="Promotion Code" required>
+							</div>
+						</div>
+
+						<div>
+							<div class="col-md-3" style="padding-left: 0;">
+								<label for="date-start">Expiry Date & Time</label>
+								<input type="datetime-local" id="Expiry" class="form-control" required>
+							</div>
+						</div>
+
+						<div>
+							<div class="col-md-3" style="padding-left: 0;"> 
+								<label for="date-start">Value</label>
+								<input type="number" id="Value" max="100" min="1" placeholder="Discount Percentage" class="form-control" required> 
+							</div>
+						</div>
+						
+						<div class="col-md-3" style="padding-left: 0;">
+							<label for="Country">Condition</label>
+							<select name="country" id="Condition" class="form-control" required>
+								<option value="" disabled selected>Select Country</option>
+								<option value="Afghanistan">Afghanistan</option>
+								<option value="Åland Islands">Åland Islands</option>
+								<option value="Albania">Albania</option>
+								<option value="Algeria">Algeria</option>
+								<option value="American Samoa">American Samoa</option>
+								<option value="Andorra">Andorra</option>
+								<option value="Angola">Angola</option>
+								<option value="Anguilla">Anguilla</option>
+								<option value="Antarctica">Antarctica</option>
+								<option value="Antigua and Barbuda">Antigua and Barbuda</option>
+								<option value="Argentina">Argentina</option>
+								<option value="Armenia">Armenia</option>
+								<option value="Aruba">Aruba</option>
+								<option value="Australia">Australia</option>
+								<option value="Austria">Austria</option>
+								<option value="Azerbaijan">Azerbaijan</option>
+								<option value="Bahamas">Bahamas</option>
+								<option value="Bahrain">Bahrain</option>
+								<option value="Bangladesh">Bangladesh</option>
+								<option value="Barbados">Barbados</option>
+								<option value="Belarus">Belarus</option>
+								<option value="Belgium">Belgium</option>
+								<option value="Belize">Belize</option>
+								<option value="Benin">Benin</option>
+								<option value="Bermuda">Bermuda</option>
+								<option value="Bhutan">Bhutan</option>
+								<option value="Bolivia">Bolivia</option>
+								<option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+								<option value="Botswana">Botswana</option>
+								<option value="Bouvet Island">Bouvet Island</option>
+								<option value="Brazil">Brazil</option>
+								<option value="British Indian Ocean Territory">British Indian Ocean Territory</option>
+								<option value="Brunei Darussalam">Brunei Darussalam</option>
+								<option value="Bulgaria">Bulgaria</option>
+								<option value="Burkina Faso">Burkina Faso</option>
+								<option value="Burundi">Burundi</option>
+								<option value="Cambodia">Cambodia</option>
+								<option value="Cameroon">Cameroon</option>
+								<option value="Canada">Canada</option>
+								<option value="Cape Verde">Cape Verde</option>
+								<option value="Cayman Islands">Cayman Islands</option>
+								<option value="Central African Republic">Central African Republic</option>
+								<option value="Chad">Chad</option>
+								<option value="Chile">Chile</option>
+								<option value="China">China</option>
+								<option value="Christmas Island">Christmas Island</option>
+								<option value="Cocos (Keeling) Islands">Cocos (Keeling) Islands</option>
+								<option value="Colombia">Colombia</option>
+								<option value="Comoros">Comoros</option>
+								<option value="Congo">Congo</option>
+								<option value="Congo, The Democratic Republic of the Congo">Congo, Democratic Republic of the Congo</option>
+								<option value="Cook Islands">Cook Islands</option>
+								<option value="Costa Rica">Costa Rica</option>
+								<option value="Cote D'ivoire">Cote D'ivoire</option>
+								<option value="Croatia">Croatia</option>
+								<option value="Cuba">Cuba</option>
+								<option value="Cyprus">Cyprus</option>
+								<option value="Czech Republic">Czech Republic</option>
+								<option value="Denmark">Denmark</option>
+								<option value="Djibouti">Djibouti</option>
+								<option value="Dominica">Dominica</option>
+								<option value="Dominican Republic">Dominican Republic</option>
+								<option value="Ecuador">Ecuador</option>
+								<option value="Egypt">Egypt</option>
+								<option value="El Salvador">El Salvador</option>
+								<option value="Equatorial Guinea">Equatorial Guinea</option>
+								<option value="Eritrea">Eritrea</option>
+								<option value="Estonia">Estonia</option>
+								<option value="Ethiopia">Ethiopia</option>
+								<option value="Falkland Islands (Malvinas)">Falkland Islands (Malvinas)</option>
+								<option value="Faroe Islands">Faroe Islands</option>
+								<option value="Fiji">Fiji</option>
+								<option value="Finland">Finland</option>
+								<option value="France">France</option>
+								<option value="French Guiana">French Guiana</option>
+								<option value="French Polynesia">French Polynesia</option>
+								<option value="French Southern Territories">French Southern Territories</option>
+								<option value="Gabon">Gabon</option>
+								<option value="Gambia">Gambia</option>
+								<option value="Georgia">Georgia</option>
+								<option value="Germany">Germany</option>
+								<option value="Ghana">Ghana</option>
+								<option value="Gibraltar">Gibraltar</option>
+								<option value="Greece">Greece</option>
+								<option value="Greenland">Greenland</option>
+								<option value="Grenada">Grenada</option>
+								<option value="Guadeloupe">Guadeloupe</option>
+								<option value="Guam">Guam</option>
+								<option value="Guatemala">Guatemala</option>
+								<option value="Guernsey">Guernsey</option>
+								<option value="Guinea">Guinea</option>
+								<option value="Guinea-bissau">Guinea-bissau</option>
+								<option value="Guyana">Guyana</option>
+								<option value="Haiti">Haiti</option>
+								<option value="Heard Island and Mcdonald Islands">Heard Island and Mcdonald Islands</option>
+								<option value="Holy See (Vatican City State)">Holy See (Vatican City State)</option>
+								<option value="Honduras">Honduras</option>
+								<option value="Hong Kong">Hong Kong</option>
+								<option value="Hungary">Hungary</option>
+								<option value="Iceland">Iceland</option>
+								<option value="India">India</option>
+								<option value="Indonesia">Indonesia</option>
+								<option value="Iran, Islamic Republic of Iran">Iran, Islamic Republic of Iran</option>
+								<option value="Iraq">Iraq</option>
+								<option value="Ireland">Ireland</option>
+								<option value="Isle of Man">Isle of Man</option>
+								<option value="Israel">Israel</option>
+								<option value="Italy">Italy</option>
+								<option value="Jamaica">Jamaica</option>
+								<option value="Japan">Japan</option>
+								<option value="Jersey">Jersey</option>
+								<option value="Jordan">Jordan</option>
+								<option value="Kazakhstan">Kazakhstan</option>
+								<option value="Kenya">Kenya</option>
+								<option value="Kiribati">Kiribati</option>
+								<option value="Korea, Democratic People's Republic of North Korea">Korea, Democratic People's Republic of North Korea</option>
+								<option value="Korea, Republic of Korea">Korea, Republic of Korea</option>
+								<option value="Kuwait">Kuwait</option>
+								<option value="Kyrgyzstan">Kyrgyzstan</option>
+								<option value="Lao People's Democratic Republic">Lao People's Democratic Republic</option>
+								<option value="Latvia">Latvia</option>
+								<option value="Lebanon">Lebanon</option>
+								<option value="Lesotho">Lesotho</option>
+								<option value="Liberia">Liberia</option>
+								<option value="Libyan Arab Jamahiriya">Libyan Arab Jamahiriya</option>
+								<option value="Liechtenstein">Liechtenstein</option>
+								<option value="Lithuania">Lithuania</option>
+								<option value="Luxembourg">Luxembourg</option>
+								<option value="Macao">Macao</option>
+								<option value="Macedonia, The Former Yugoslav Republic of Macedonia">Macedonia, Former Yugoslav Republic of Macedonia</option>
+								<option value="Madagascar">Madagascar</option>
+								<option value="Malawi">Malawi</option>
+								<option value="Malaysia">Malaysia</option>
+								<option value="Maldives">Maldives</option>
+								<option value="Mali">Mali</option>
+								<option value="Malta">Malta</option>
+								<option value="Marshall Islands">Marshall Islands</option>
+								<option value="Martinique">Martinique</option>
+								<option value="Mauritania">Mauritania</option>
+								<option value="Mauritius">Mauritius</option>
+								<option value="Mayotte">Mayotte</option>
+								<option value="Mexico">Mexico</option>
+								<option value="Micronesia, Federated States of Micronesia">Micronesia, Federated States of Micronesia</option>
+								<option value="Moldova, Republic of Moldova">Moldova, Republic of Moldova</option>
+								<option value="Monaco">Monaco</option>
+								<option value="Mongolia">Mongolia</option>
+								<option value="Montenegro">Montenegro</option>
+								<option value="Montserrat">Montserrat</option>
+								<option value="Morocco">Morocco</option>
+								<option value="Mozambique">Mozambique</option>
+								<option value="Myanmar">Myanmar</option>
+								<option value="Namibia">Namibia</option>
+								<option value="Nauru">Nauru</option>
+								<option value="Nepal">Nepal</option>
+								<option value="Netherlands">Netherlands</option>
+								<option value="Netherlands Antilles">Netherlands Antilles</option>
+								<option value="New Caledonia">New Caledonia</option>
+								<option value="New Zealand">New Zealand</option>
+								<option value="Nicaragua">Nicaragua</option>
+								<option value="Niger">Niger</option>
+								<option value="Nigeria">Nigeria</option>
+								<option value="Niue">Niue</option>
+								<option value="Norfolk Island">Norfolk Island</option>
+								<option value="Northern Mariana Islands">Northern Mariana Islands</option>
+								<option value="Norway">Norway</option>
+								<option value="Oman">Oman</option>
+								<option value="Pakistan">Pakistan</option>
+								<option value="Palau">Palau</option>
+								<option value="Palestinian Territory, Occupied">Palestinian Territory, Occupied</option>
+								<option value="Panama">Panama</option>
+								<option value="Papua New Guinea">Papua New Guinea</option>
+								<option value="Paraguay">Paraguay</option>
+								<option value="Peru">Peru</option>
+								<option value="Philippines">Philippines</option>
+								<option value="Pitcairn">Pitcairn</option>
+								<option value="Poland">Poland</option>
+								<option value="Portugal">Portugal</option>
+								<option value="Puerto Rico">Puerto Rico</option>
+								<option value="Qatar">Qatar</option>
+								<option value="Reunion">Reunion</option>
+								<option value="Romania">Romania</option>
+								<option value="Russian Federation">Russian Federation</option>
+								<option value="Rwanda">Rwanda</option>
+								<option value="Saint Helena">Saint Helena</option>
+								<option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
+								<option value="Saint Lucia">Saint Lucia</option>
+								<option value="Saint Pierre and Miquelon">Saint Pierre and Miquelon</option>
+								<option value="Saint Vincent and The Grenadines">Saint Vincent and The Grenadines</option>
+								<option value="Samoa">Samoa</option>
+								<option value="San Marino">San Marino</option>
+								<option value="Sao Tome and Principe">Sao Tome and Principe</option>
+								<option value="Saudi Arabia">Saudi Arabia</option>
+								<option value="Senegal">Senegal</option>
+								<option value="Serbia">Serbia</option>
+								<option value="Seychelles">Seychelles</option>
+								<option value="Sierra Leone">Sierra Leone</option>
+								<option value="Singapore">Singapore</option>
+								<option value="Slovakia">Slovakia</option>
+								<option value="Slovenia">Slovenia</option>
+								<option value="Solomon Islands">Solomon Islands</option>
+								<option value="Somalia">Somalia</option>
+								<option value="South Africa">South Africa</option>
+								<option value="South Georgia and The South Sandwich Islands">South Georgia and The South Sandwich Islands</option>
+								<option value="Spain">Spain</option>
+								<option value="Sri Lanka">Sri Lanka</option>
+								<option value="Sudan">Sudan</option>
+								<option value="Suriname">Suriname</option>
+								<option value="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option>
+								<option value="Swaziland">Swaziland</option>
+								<option value="Sweden">Sweden</option>
+								<option value="Switzerland">Switzerland</option>
+								<option value="Syrian Arab Republic">Syrian Arab Republic</option>
+								<option value="Taiwan">Taiwan</option>
+								<option value="Tajikistan">Tajikistan</option>
+								<option value="Tanzania, United Republic of Tanzania">Tanzania, United Republic of Tanzania</option>
+								<option value="Thailand">Thailand</option>
+								<option value="Timor-leste">Timor-leste</option>
+								<option value="Togo">Togo</option>
+								<option value="Tokelau">Tokelau</option>
+								<option value="Tonga">Tonga</option>
+								<option value="Trinidad and Tobago">Trinidad and Tobago</option>
+								<option value="Tunisia">Tunisia</option>
+								<option value="Turkey">Turkey</option>
+								<option value="Turkmenistan">Turkmenistan</option>
+								<option value="Turks and Caicos Islands">Turks and Caicos Islands</option>
+								<option value="Tuvalu">Tuvalu</option>
+								<option value="Uganda">Uganda</option>
+								<option value="Ukraine">Ukraine</option>
+								<option value="United Arab Emirates">United Arab Emirates</option>
+								<option value="United Kingdom">United Kingdom</option>
+								<option value="United States">United States</option>
+								<option value="United States Minor Outlying Islands">United States Minor Outlying Islands</option>
+								<option value="Uruguay">Uruguay</option>
+								<option value="Uzbekistan">Uzbekistan</option>
+								<option value="Vanuatu">Vanuatu</option>
+								<option value="Venezuela">Venezuela</option>
+								<option value="Viet Nam">Viet Nam</option>
+								<option value="Virgin Islands, British">Virgin Islands, British</option>
+								<option value="Virgin Islands, U.S.">Virgin Islands, U.S.</option>
+								<option value="Wallis and Futuna">Wallis and Futuna</option>
+								<option value="Western Sahara">Western Sahara</option>
+								<option value="Yemen">Yemen</option>
+								<option value="Zambia">Zambia</option>
+								<option value="Zimbabwe">Zimbabwe</option>
+							</select>								
+							</label>
+						</div>
+
+						<div class=" col-md-2" style=" padding-left: 0; margin-top: 30px;">
+							<input id="Create_btn" type="submit" class="btn btn-primary" style="padding-top: 11px; padding-bottom: 11px;" value="Add">
+						</div>
+					</form>		
+				</div>
+
+				<!----------Promo Table---------->
+				<div class="col-md-12 animate-box" style="margin-top: 55px;">	
+					<div class="gtco-contact-info">
+
+						<div id="BookingsTableWrapper" class="table-wrapper disable-select" style="margin-top: 0px; width: auto;">
+							<table class="fl-table">
+								<thead>
+								<tr>
+									<th style="width: 10%;">Promo ID</th>
+									<th style="width: auto;">Promo Code</th>
+									<th style="width: 10%;">Value</th>
+									<th style="width: auto;">Creation Date</th>
+									<th style="width: auto;">Expiry Date</th>
+									<th style="width: auto;">Promo Condition</th>
+								</tr>
+								</thead>
+								<tbody id="PromoTable"><tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var number = document.getElementById('Value');
+
+		// Listen for input event on numInput.
+		number.onkeydown = function(e) {
+			if(!((e.keyCode > 95 && e.keyCode < 106)
+			|| (e.keyCode > 47 && e.keyCode < 58) 
+			|| e.keyCode == 8)) {
+				return false;
+			}
+		}
+	</script>
+
+	<footer id="gtco-footer" role="contentinfo">
+		<div class="gtco-container">
+			<div class="row row-p	b-md">
+
+				<div class="col-md-4">
+					<div class="gtco-widget">
+						<h3>About Us</h3>
+						<p>We are an airlines forged by the great Duncan, he is our lord and saviour and our best pilot in the fleet. Borned from the heavens, he is gilded with the best intuition with safety being his number one priority. All hail the great Duncan!</p>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>      </h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">      </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">   </a></li>
+							<li><a href="#">     </a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Promotions</h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">Europe</a></li>
+							<li><a href="#">Asia</a></li>
+							<li><a href="#">America</a></li>
+							<li><a href="#">Canada</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-3 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Get In Touch</h3>
+						<ul class="gtco-quick-contact">
+							<li><a href="#"><i class="icon-phone"></i> +1 234 567 890</a></li>
+							<li><a href="#"><i class="icon-mail2"></i> info@freehtml5.co</a></li>
+							<li><a href="#"><i class="icon-chat"></i> Live Chat</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="row copyright">
+				<div class="col-md-12">
+					<p class="pull-left">
+						<small class="block">&copy; 2016 Free HTML5. All Rights Reserved.</small> 
+						<small class="block">Designed by <a href="https://freehtml5.co/" target="_blank">FreeHTML5.co</a> Demo Images: <a href="http://unsplash.com/" target="_blank">Unsplash</a></small>
+					</p>
+					<p class="pull-right">
+						<ul class="gtco-social-icons pull-right">
+							<li><a href="#"><i class="icon-twitter"></i></a></li>
+							<li><a href="#"><i class="icon-facebook"></i></a></li>
+							<li><a href="#"><i class="icon-linkedin"></i></a></li>
+							<li><a href="#"><i class="icon-dribbble"></i></a></li>
+						</ul>
+					</p>
+				</div>
+			</div>
+
+		</div>
+	</footer>
+	<!-- </div> -->
+
+	</div>
+
+	<div class="gototop js-top">
+		<a href="#" class="js-gotop"><i class="icon-arrow-up"></i></a>
+	</div>
+	
+	<!-- jQuery -->
+	<script src="js/jquery.min.js"></script>
+	<!-- jQuery Easing -->
+	<script src="js/jquery.easing.1.3.js"></script>
+	<!-- Bootstrap -->
+	<script src="js/bootstrap.min.js"></script>
+	<!-- Waypoints -->
+	<script src="js/jquery.waypoints.min.js"></script>
+	<!-- Carousel -->
+	<script src="js/owl.carousel.min.js"></script>
+	<!-- countTo -->
+	<script src="js/jquery.countTo.js"></script>
+
+	<!-- Stellar Parallax -->
+	<script src="js/jquery.stellar.min.js"></script>
+
+	<!-- Magnific Popup -->
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/magnific-popup-options.js"></script>
+	
+	<!-- Datepicker -->
+	<script src="js/bootstrap-datepicker.min.js"></script>
+	
+
+	<!-- Main -->
+	<script src="js/main.js"></script>
+
+	</body>
+</html>
+

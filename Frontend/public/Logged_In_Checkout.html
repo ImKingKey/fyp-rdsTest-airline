@@ -1,0 +1,747 @@
+<!DOCTYPE HTML>
+<!--
+	Name: Duncan Lim Qing Rong
+	Class: DISM/FT/2A/01
+	Admin Number: P2136785
+-->
+
+<!--
+	Traveler by freehtml5.co
+	Twitter: http://twitter.com/fh5co
+	URL: http://freehtml5.co
+-->
+<html>
+	<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SP|Air &mdash; Duncan's BED CA2 &mdash; DISM2A01.org</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<meta name="description" content="Free HTML5 Website Template by FreeHTML5.co" />
+	<meta name="keywords" content="free website templates, free html5, free template, free bootstrap, free website template, html5, css3, mobile first, responsive" />
+	<meta name="author" content="FreeHTML5.co" />
+
+  	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content=""/>
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content=""/>
+	<meta property="og:description" content=""/>
+	<meta name="twitter:title" content="" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="" />
+
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+	
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="css/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="css/icomoon.css">
+	<!-- Themify Icons-->
+	<link rel="stylesheet" href="css/themify-icons.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="css/bootstrap.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/magnific-popup.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
+
+	<!-- Owl Carousel  -->
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+
+	<!-- Theme style  -->
+	<link rel="stylesheet" href="css/style.css">
+
+	<!-- Modernizr JS -->
+	<script src="js/modernizr-2.6.2.min.js"></script>
+	<!-- FOR IE9 below -->
+	<!--[if lt IE 9]>
+	<script src="js/respond.min.js"></script>
+	<![endif]-->
+
+	<!-- Icons -->
+	<script src="https://kit.fontawesome.com/4d486d1312.js" crossorigin="anonymous"></script>
+	
+	<!--------------Script Handling Promo Codes---------------->
+	<script>
+		function clearLocal() {
+			localStorage.clear();
+		}
+	</script>
+	
+	<script>
+		$(document).ready(function() {
+			//Retrieve Search Details
+			var searchDetails = sessionStorage.getItem('SearchDetails')
+			var searchDetailsJSON = JSON.parse(searchDetails)
+
+			//Get Airport Details
+			var AirportList = sessionStorage.getItem('AirportList')
+			var AirportListJSON = JSON.parse(AirportList)
+
+			$('#ApplyPromo_btn').click(function () {
+				var PromoCode = $('#PromoCode').val()
+
+				var destinationCountry = ''
+				var TotalPrice = ''
+				var postHTML = ``
+
+				if (searchDetailsJSON.TripType == 'One-Way') {
+					//Retrieve Booking Details
+					var BookingDet = sessionStorage.getItem("BookingDetails")
+					var BookingDetJSON = JSON.parse(BookingDet)
+
+					for(let i = 0; i < AirportListJSON.length; i++) {
+
+						if(AirportListJSON[i].Name == BookingDetJSON.DestinationAirport) {
+							destinationCountry = AirportListJSON[i].Country
+						}
+					}
+
+				} else if (searchDetailsJSON.TripType == 'Round Trip') {
+					//Retrieve Booking Details
+					var DepartBookingDet = sessionStorage.getItem("DepartBookingDetails")
+					var DepartBookingDetJSON = JSON.parse(DepartBookingDet)
+
+					for(let i = 0; i < AirportListJSON.length; i++) {
+
+						if(AirportListJSON[i].Name == DepartBookingDetJSON.DestinationAirport) {
+							destinationCountry = AirportListJSON[i].Country
+						}
+					}
+				}
+
+				//Calcualte Total Price
+				if (searchDetailsJSON.TripType == 'One-Way') {
+					//Retrieve Booking Details
+					var BookingDet = sessionStorage.getItem("BookingDetails")
+					var BookingDetJSON = JSON.parse(BookingDet)
+
+					TotalPrice = BookingDetJSON.Price.toFixed(2)
+
+				} else if (searchDetailsJSON.TripType == 'Round Trip') {
+					//Retrieve Booking Details
+					var DepartBookingDet = sessionStorage.getItem("DepartBookingDetails")
+					var DepartBookingDetJSON = JSON.parse(DepartBookingDet)
+
+					//Retrieve Booking Details
+					var ReturnBookingDet = sessionStorage.getItem("ReturnBookingDetails")
+					var ReturnBookingDetJSON = JSON.parse(ReturnBookingDet)
+
+					TotalPrice = (parseInt(DepartBookingDetJSON.Price) + parseInt(ReturnBookingDetJSON.Price)).toFixed(2)
+				}
+				
+				$.ajax({
+					url: 'http://localhost:8081/api/promos',  
+					type: 'GET',
+					contentType: "application/json; charset=utf-8",
+					dataType: 'json',  
+					success: function (data, textStatus, xhr) {
+						sessionStorage.setItem("PromoList", JSON.stringify(data))
+						console.log('GET Success [Promos]')
+
+						var Promos = sessionStorage.getItem("PromoList")
+						var PromosJSON = JSON.parse(Promos)
+						
+						for(let i = 0; i < PromosJSON.length; i++) {
+
+							if(PromosJSON[i].PromoCondition == destinationCountry) {
+
+								if (PromoCode == PromosJSON[i].Code) {
+									postHTML += `<label>Discounted Price - $${calculateDiscount(PromosJSON[i].Value, TotalPrice)}</label>`
+									$('#TotalPrice').append(postHTML)
+
+								} else {
+									alert('Invalid Promo Code')
+									break
+								}
+							} 
+						}
+					}
+				})
+			})
+		})
+	</script>
+
+	<script>	
+		function Return() {
+			window.location.assign("http://localhost:3001/Logged_In_Home.html");
+		}
+	</script>
+
+	<!------------------------------Handle Depart Booking------------------------------>
+	<script>
+		$(document).ready(function() {
+
+			//Retrieve User Details
+			var UserInfo = localStorage.getItem("userInfo")
+			var UserJSONInfo = JSON.parse(UserInfo)
+			
+			//Retrieve Search Details
+			var SearchInfo = sessionStorage.getItem("SearchDetails")
+			var SearchJSONInfo = JSON.parse(SearchInfo)
+
+			//Retrieve Passenger Details
+			var PassengerDet = sessionStorage.getItem("PassengerInfo")
+			var PassengerDetJSON = JSON.parse(PassengerDet)
+
+			var tmpToken = localStorage.getItem('token');
+
+			$('#Payment_btn').click(function () {
+				//Card Details
+				var tmpCardNo = $('#CreditCard').val()
+				var tmpExpiry = $('#Expiry').val()
+				var tmpCVC = $('#CVC').val()
+
+				if (SearchJSONInfo.TripType == 'Round Trip') {
+					//Retrieve Booking Details
+					var DepartBookingDet = sessionStorage.getItem("DepartBookingDetails")
+					var DepartBookingDetJSON = JSON.parse(DepartBookingDet)
+
+					//Retrieve Booking Details
+					var ReturnBookingDet = sessionStorage.getItem("ReturnBookingDetails")
+					var ReturnBookingDetJSON = JSON.parse(ReturnBookingDet)
+
+					//Booking Details
+					var tmpName = PassengerDetJSON.FullName
+					var tmpPassport = PassengerDetJSON.Passport
+					var tmpNationality = PassengerDetJSON.Nationality
+					var tmpAge = PassengerDetJSON.Age
+					var tmpUserID = UserJSONInfo[0].UserID
+					var tmpDepartFlightID = DepartBookingDetJSON.FlightID
+					var tmpReturnFlightID = ReturnBookingDetJSON.FlightID
+
+					if (tmpCardNo == '' || tmpExpiry == '' || tmpCVC == '') {
+						alert('Payment Failed - Please Fill Required Fields For Payment')
+					
+					} else {
+						var DepartData = "{\"Name\":\""+tmpName+"\", \"Passport\":\""+tmpPassport+"\", \"Nationality\":\""+tmpNationality+"\", \"Age\":\""+tmpAge+"\", \"UserID\":\""+tmpUserID+"\", \"Flight\":\""+tmpDepartFlightID+"\"}"; 
+
+						$.ajax({
+							headers: {'authorization': 'Bearer '+ tmpToken},     
+							url: 'http://localhost:8081/api/booking',  
+							type: 'POST',
+							data: DepartData,
+							contentType: "application/json; charset=utf-8",
+							dataType: 'json',  
+							success: function (data, textStatus, xhr) {
+								
+								var ReturnData = "{\"Name\":\""+tmpName+"\", \"Passport\":\""+tmpPassport+"\", \"Nationality\":\""+tmpNationality+"\", \"Age\":\""+tmpAge+"\", \"UserID\":\""+tmpUserID+"\", \"Flight\":\""+tmpReturnFlightID+"\"}"; 
+
+								$.ajax({
+									headers: {'authorization': 'Bearer '+ tmpToken},     
+									url: 'http://localhost:8081/api/booking',  
+									type: 'POST',
+									data: ReturnData,
+									contentType: "application/json; charset=utf-8",
+									dataType: 'json',  
+									success: function (data, textStatus, xhr) {
+										
+										var html = `<h1 style='font-weight: 400; padding-top:50px; padding-bottom:10px;'>Payment Completed!</h1>
+													<h1 style='font-weight: 400; padding-bottom:40px;'>Thank You For Choosing Us!</h1>
+													<input id="Return" onclick="Return()" type="submit" class="btn btn-primary" style="padding: 9.5px; padding-right: 22px; padding-left: 22px;" value="Return to Home">`
+										
+										const parent = document.getElementById("ThankYou");
+										parent.innerHTML = '';
+
+										$('#ThankYou').append(html)
+									},
+
+									error: function (xhr, textStatus, errorThrown) {
+										alert('Payment Not Successful - Please Enter Valid Values')
+										console.log('Error in Operation');  
+										console.log(JSON.stringify(xhr))
+										console.log(textStatus)
+										console.log(JSON.stringify(errorThrown))
+									}
+								})
+							},
+
+							error: function (xhr, textStatus, errorThrown) {
+								alert('Payment Not Successful - Please Enter Valid Values')
+								console.log('Error in Operation');  
+								console.log(JSON.stringify(xhr))
+								console.log(textStatus)
+								console.log(JSON.stringify(errorThrown))
+							}
+						})
+					}
+
+				} else if (SearchJSONInfo.TripType == 'One-Way') {
+					//Retrieve Booking Details
+					var BookingDet = sessionStorage.getItem("BookingDetails")
+					var BookingDetJSON = JSON.parse(BookingDet)
+
+					//Booking Details
+					var tmpName = PassengerDetJSON.FullName
+					var tmpPassport = PassengerDetJSON.Passport
+					var tmpNationality = PassengerDetJSON.Nationality
+					var tmpAge = PassengerDetJSON.Age
+					var tmpUserID = UserJSONInfo[0].UserID
+					var tmpFlightID = BookingDetJSON.FlightID
+
+					if (tmpCardNo == '' || tmpExpiry == '' || tmpCVC == '') {
+						alert('Payment Failed - Please Fill Required Fields For Payment')
+					
+					} else {
+						var DepartData = "{\"Name\":\""+tmpName+"\", \"Passport\":\""+tmpPassport+"\", \"Nationality\":\""+tmpNationality+"\", \"Age\":\""+tmpAge+"\", \"UserID\":\""+tmpUserID+"\", \"Flight\":\""+tmpFlightID+"\"}"; 
+
+						$.ajax({
+							headers: {'authorization': 'Bearer '+ tmpToken},     
+							url: 'http://localhost:8081/api/booking',  
+							type: 'POST',
+							data: DepartData,
+							contentType: "application/json; charset=utf-8",
+							dataType: 'json',  
+							success: function (data, textStatus, xhr) {
+
+								var html = `<h1 style='font-weight: 400; padding-top:50px; padding-bottom:10px;'>Payment Completed!</h1>
+											<h1 style='font-weight: 400; padding-bottom:40px;'>Thank You For Choosing Us!</h1>
+											<input id="Return" onclick="Return()" type="submit" class="btn btn-primary" style="padding: 9.5px; padding-right: 22px; padding-left: 22px;" value="Return to Home">`
+										
+										const parent = document.getElementById("ThankYou");
+										parent.innerHTML = '';
+
+								$('#ThankYou').append(html)
+							},
+
+							error: function (xhr, textStatus, errorThrown) {
+								alert('Payment Not Successful - Please Enter Valid Values')
+								console.log('Error in Operation');  
+								console.log(JSON.stringify(xhr))
+								console.log(textStatus)
+								console.log(JSON.stringify(errorThrown))
+							}
+						})
+					}
+				}
+				return false
+			})
+
+			$("#Logout").click(function () {
+					localStorage.clear();
+					window.location.assign("http://localhost:3001/index.html");
+			})
+		})
+	</script>
+
+	</head>
+	<body>
+		
+	<div class="gtco-loader"></div>
+	
+	<div id="page">
+
+	<!-- <div class="page-inner"> -->
+	<nav class="gtco-nav" role="navigation">
+		<div class="gtco-container">
+			<div class="row">
+				<div class="col-sm-4 col-xs-12">
+					<div id="gtco-logo"><a href="Logged_In_Home.html">SP|Air <em>.</em></a></div>
+				</div>
+				<div class="col-xs-8 text-right menu-1">
+					<ul>
+						<li class="active"><a href="Logged_In_Home.html">Book Your Flight</a></li>
+
+						<li class="has-dropdown">
+							<a id="NavUName" href="#"></a>
+							<ul class="dropdown">
+								<li><a href="Logged_In_Profile.html">View Profile</a></li>
+								<li><a href="My_Bookings.html">My Bookings</a></li>
+								<li><a id="Logout" href="index.html" onclick="clearLocal()">Logout</a></li>
+							</ul>
+						</li>
+					</ul>	
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<script>
+		//Retrieve User Data from Local Storage
+		const userData = localStorage.getItem('userInfo')
+		const userJSONData = JSON.parse(userData)
+		var navUname = userJSONData[0].Username
+
+		//Show Username on Nav Bar
+		const listItem = document.querySelector("#NavUName");
+		const newItem = document.createElement('li');
+		newItem.innerHTML = `<a href="#">${navUname}</a>`;	
+		listItem.parentNode.replaceChild(newItem, listItem);
+	</script>
+	
+	<header id="gtco-header" class="gtco-cover gtco-cover-sm" role="banner" style="background-image: url(images/josue-isai-ramos-figueroa-n2NBgIx3A28-unsplash.jpg); height: 700px;">
+		<div class="overlay"></div>
+		<div class="gtco-container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-0 text-center">
+					<div class="row row-mt-15em">
+						<div class="col-md-12 mt-text animate-box" style="margin-bottom: 20px;" data-animate-effect="fadeInUp">
+							<h1>One Last Step!</h1>	
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<script>
+		function getDateAndTime (Timestamp){
+
+			var d = new Date(Timestamp);
+			d.getUTCFullYear();
+			d.getUTCMonth();
+			d.getUTCDate();
+			d.getUTCHours();
+			d.getUTCMinutes();
+			d.getUTCSeconds()
+			return(d.toUTCString())
+		}
+
+		function getDate (Timestamp){
+
+			var d = new Date(Timestamp);
+			d.getUTCFullYear();
+			d.getUTCMonth();
+			d.getUTCDate();
+			d.getUTCHours();
+			d.getUTCMinutes();
+			d.getUTCSeconds()
+			return(d.toUTCString())
+		}
+	</script>
+
+	<script>
+		function calculateDiscount(Discount, Price) {
+			var DisPrice = 100 - Discount
+			var Price = (Price/100) * DisPrice
+			return Price.toFixed(2)
+		}
+	</script>
+
+	<!-----------Script to List Total Price---------------->
+	<script>
+		$(document).ready(function() {
+
+			//Retrieve Search Details
+			var SearchInfo = sessionStorage.getItem("SearchDetails")
+			var SearchJSONInfo = JSON.parse(SearchInfo)
+
+			if (SearchJSONInfo.TripType == 'One-Way') {
+				//Retrieve Booking Details
+				var BookingDet = sessionStorage.getItem("BookingDetails")
+				var BookingDetJSON = JSON.parse(BookingDet)
+
+				var TotalPrice = BookingDetJSON.Price.toFixed(2)
+
+				var postHTML = `<label>Total Price - $${TotalPrice}</label>`
+
+				$('#TotalPrice').append(postHTML)
+
+			} else if (SearchJSONInfo.TripType == 'Round Trip') {
+				console.log('start1')
+				//Retrieve Booking Details
+				var DepartBookingDet = sessionStorage.getItem("DepartBookingDetails")
+				var DepartBookingDetJSON = JSON.parse(DepartBookingDet)
+
+				//Retrieve Booking Details
+				var ReturnBookingDet = sessionStorage.getItem("ReturnBookingDetails")
+				var ReturnBookingDetJSON = JSON.parse(ReturnBookingDet)
+
+				var TotalPrice = (parseInt(DepartBookingDetJSON.Price) + parseInt(ReturnBookingDetJSON.Price)).toFixed(2)
+
+				var postHTML = `<label>Total Price - $${TotalPrice}</label>`
+
+				$('#TotalPrice').append(postHTML)
+			}
+		})
+	</script>
+
+	<!-----------Script to Populate Booking Summary---------------->
+	<script>
+		$(document).ready(function() {
+
+				//Retrieve User Details
+				var UserInfo = localStorage.getItem("userInfo")
+				var UserJSONInfo = JSON.parse(UserInfo)
+				
+				//Retrieve Search Details
+				var SearchInfo = sessionStorage.getItem("SearchDetails")
+				var SearchJSONInfo = JSON.parse(SearchInfo)
+
+			if(SearchJSONInfo.TripType == 'One-Way') {
+
+				//Retrieve Booking Details
+				var BookingDet = sessionStorage.getItem("BookingDetails")
+				var BookingDetJSON = JSON.parse(BookingDet)
+
+				//Retrieve Passenger Details
+				var PassengerDet = sessionStorage.getItem("PassengerInfo")
+				var PassengerDetJSON = JSON.parse(PassengerDet)
+
+				var postHTML = `<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Account Name: </h4>     				<h4 class='col-md-7' style='font-weight:300;'>${UserJSONInfo[0].Username}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Account Email: </h4>            		<h4 class='col-md-7' style='font-weight:300;'>${UserJSONInfo[0].Email}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Passenger's Name: </h4>     			<h4 class='col-md-7' style='font-weight:300;'>${PassengerDetJSON.FullName}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Passport Number: </h4>     			<h4 class='col-md-7' style='font-weight:300;'>${PassengerDetJSON.Passport}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Nationality: </h4>     				<h4 class='col-md-7' style='font-weight:300;'>${(PassengerDetJSON.Nationality).charAt(0).toUpperCase() + (PassengerDetJSON.Nationality).slice(1)}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Contact Number: </h4>   				<h4 class='col-md-7' style='font-weight:300;'>${UserJSONInfo[0].Contact}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Trip Type: </h4>        				<h4 class='col-md-7' style='font-weight:300;'>${SearchJSONInfo.TripType}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Flight Code: </h4>      				<h4 class='col-md-7' style='font-weight:300;'>${BookingDetJSON.FlightCode}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Aircraft: </h4>         				<h4 class='col-md-7' style='font-weight:300;'>${BookingDetJSON.Aircraft}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Departing From: </h4>   				<h4 class='col-md-7' style='font-weight:300;'>${BookingDetJSON.OriginAirport}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Arriving At: </h4>      				<h4 class='col-md-7' style='font-weight:300;'>${UserJSONInfo[0].Username}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Departure Date: </h4>   				<h4 class='col-md-7' style='font-weight:300;'>${getDate(BookingDetJSON.EmbarkDate)}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Estimated Arrival Time: </h4>   		<h4 class='col-md-7' style='font-weight:300;'>${getDate(BookingDetJSON.ArrivalDate)}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Estimated Flight Duration: </h4>   	<h4 class='col-md-7' style='font-weight:300;'>${BookingDetJSON.TravelTime}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Total Price: </h4>   				<h4 class='col-md-7' style='font-weight:300;'>$${BookingDetJSON.Price.toFixed(2)}</h4>`
+
+				$('#BookingSummary').append(postHTML)	
+
+			} else if (SearchJSONInfo.TripType == 'Round Trip') {
+
+				//Retrieve Passenger Details
+				var PassengerDet = sessionStorage.getItem("PassengerInfo")
+				var PassengerDetJSON = JSON.parse(PassengerDet)
+
+				//Retrieve Booking Details
+				var DepartBookingDet = sessionStorage.getItem("DepartBookingDetails")
+				var DepartBookingDetJSON = JSON.parse(DepartBookingDet)
+
+				//Retrieve Booking Details
+				var ReturnBookingDet = sessionStorage.getItem("ReturnBookingDetails")
+				var ReturnBookingDetJSON = JSON.parse(ReturnBookingDet)
+
+				var postHTML = `<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Account Name: </h4>     				<h4 class='col-md-7' style='font-weight:300;'>${UserJSONInfo[0].Username}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Account Email: </h4>            		<h4 class='col-md-7' style='font-weight:300;'>${UserJSONInfo[0].Email}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Passenger's Name: </h4>     			<h4 class='col-md-7' style='font-weight:300;'>${PassengerDetJSON.FullName}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Passport Number: </h4>     			<h4 class='col-md-7' style='font-weight:300;'>${PassengerDetJSON.Passport}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Nationality: </h4>     				<h4 class='col-md-7' style='font-weight:300;'>${(PassengerDetJSON.Nationality).charAt(0).toUpperCase() + (PassengerDetJSON.Nationality).slice(1)}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Contact Number: </h4>   				<h4 class='col-md-7' style='font-weight:300;'>${UserJSONInfo[0].Contact}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Trip Type: </h4>        				<h4 class='col-md-7' style='font-weight:300;'> ${SearchJSONInfo.TripType}</h4>
+
+								<h4 class='col-md-12' style="text-decoration: 1px underline; text-underline-offset: 10px; margin-top: 50px; margin-bottom: 50px; padding-left: 0;">Departure Flight</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Flight Code: </h4>      				<h4 class='col-md-7' style='font-weight:300;'>${DepartBookingDetJSON.FlightCode}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Aircraft: </h4>         				<h4 class='col-md-7' style='font-weight:300;'>${DepartBookingDetJSON.Aircraft}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Departing From: </h4>   				<h4 class='col-md-7' style='font-weight:300;'>${DepartBookingDetJSON.OriginAirport}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Arriving At: </h4>      				<h4 class='col-md-7' style='font-weight:300;'>${UserJSONInfo[0].Username}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Departure Date: </h4>   				<h4 class='col-md-7' style='font-weight:300;'>${getDate(DepartBookingDetJSON.EmbarkDate)}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Estimated Arrival Time: </h4>   		<h4 class='col-md-7' style='font-weight:300;'>${getDate(DepartBookingDetJSON.ArrivalDate)}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Estimated Flight Duration: </h4>   	<h4 class='col-md-7' style='font-weight:300;'>${DepartBookingDetJSON.TravelTime}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Price: </h4>   						<h4 class='col-md-7' style='font-weight:300;'>$${DepartBookingDetJSON.Price.toFixed(2)}</h4>
+								
+								<h4 class='col-md-12' style="text-decoration: 1px underline; text-underline-offset: 10px; margin-top: 50px; margin-bottom: 50px; padding-left: 0;">Return Flight</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Flight Code: </h4>      				<h4 class='col-md-7' style='font-weight:300;'>${ReturnBookingDetJSON.FlightCode}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Aircraft: </h4>         				<h4 class='col-md-7' style='font-weight:300;'>${ReturnBookingDetJSON.Aircraft}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Departing From: </h4>   				<h4 class='col-md-7' style='font-weight:300;'>${ReturnBookingDetJSON.OriginAirport}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Arriving At: </h4>      				<h4 class='col-md-7' style='font-weight:300;'>${UserJSONInfo[0].Username}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Departure Date: </h4>   				<h4 class='col-md-7' style='font-weight:300;'>${getDate(ReturnBookingDetJSON.EmbarkDate)}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Estimated Arrival Time: </h4>   		<h4 class='col-md-7' style='font-weight:300;'>${getDate(ReturnBookingDetJSON.ArrivalDate)}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Estimated Flight Duration: </h4>   	<h4 class='col-md-7' style='font-weight:300;'>${ReturnBookingDetJSON.TravelTime}</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Price: </h4>   						<h4 class='col-md-7' style='font-weight:300;'>$${ReturnBookingDetJSON.Price.toFixed(2)}</h4>
+								
+								<h4 class='col-md-12' style="text-decoration: 1px underline; text-underline-offset: 10px; margin-top: 50px; padding-left: 0;">Total Price</h4>
+								<h4 class='col-md-5' style='font-weight:400; padding-left: 0;'>Total Price: </h4>      				<h4 class='col-md-7' style='font-weight:300;'>$${(parseInt(DepartBookingDetJSON.Price) + parseInt(ReturnBookingDetJSON.Price)).toFixed(2)}</h4>`
+								
+
+				$('#BookingSummary').append(postHTML)	
+
+			}
+		})
+	</script>
+
+	<div class="gtco-section border-bottom">
+		<div class="gtco-container">
+			<div class="row" id='ThankYou'>
+				<div class="col-md-7" style="margin-top: 30px;">
+					<div class="col-md-12 animate-box">
+					<h3 style="text-decoration: 1px underline; text-underline-offset: 10px;">Booking Summary</h3>
+					<div id="BookingSummary" style="margin-top: 50px;">
+						
+					</div>
+				</div>
+				</div>
+
+				<!---------Payment Section----------->
+				<div class="col-md-4 col-md-push-1 animate-box" style="margin-top: 30px; border: 1px solid lightgrey; border-radius: 15px; padding: 20px; padding-bottom: 15px; box-shadow: 0px 1px 20px 0px rgba(0, 0, 0, 0.19);;">	
+					<h4>Payment</h4> 
+					<div class="row form-group col-md-12" style="padding-right: 0px;">
+						<div >
+							<i class="fas fa-credit-card" style="margin-right: 10px;"></i><label>Card Number</label>
+							<input type="number" id="CreditCard" placeholder="Card Number" class="form-control validated-field col-md-12">
+						</div>
+					</div>
+					
+					<div class="row form-group col-md-6" style="margin-right: 15px; padding-right: 0px;">
+						<div>
+							<label>Expiry</label>
+							<input type="tel" pattern="[0-9]*" maxlength="5" id="Expiry" placeholder="MM/YY" class="form-control validated-field col-md-12">
+						</div>
+					</div>
+
+					<div class="row form-group col-md-6" style="padding-right: 0px;">
+						<div>
+							<label>CVC</label>
+							<input type="tel" pattern="[0-9]*" maxlength="5" id="CVC" placeholder="CVC" class="form-control validated-field col-md-12">
+						</div>
+					</div>
+
+					<div class="row form-group col-md-7" style="padding-right: 0px;">
+						<div>
+							<i class="fa-solid fa-percent" style="margin-right: 10px;"></i><label>Promo Code</label>
+							<input type="text" id="PromoCode" placeholder="Promo Code" class="form-control col-md-12">
+						</div>
+					</div>
+
+					<div class="row form-group col-md-5" style="margin-left: 30px; padding-right: 0px; width: 120px; margin-top: 35px;">
+						<div>
+							<input type="submit" id="ApplyPromo_btn" value="Apply" class="btn btn-primary col-md-12">
+						</div>
+					</div>
+
+					<div class="row form-group col-md-12">
+						<div id="TotalPrice">
+							
+						</div>
+					</div>
+
+					<div class="form-group">
+						<input type="submit" id="Payment_btn" value="Pay Now" class="btn btn-primary">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!------------------------Validate VISA Card Number----------------------->
+	<script>
+		$(document).ready(function () {
+
+			var fields = document.getElementsByClassName("validated-field")
+			var cardno = /^(?:4[0-9]{12}(?:[0-9]{3})?)$/;
+
+			if (Array.from(fields).length > 0) {
+				Array.from(fields).forEach(field => {
+					field.addEventListener("input", function(e) {
+					
+					if(e.target.value.match(cardno)) {
+						e.target.classList.remove("not-valid")
+
+					} else {
+						e.target.classList.add("not-valid")
+					}
+		
+					})
+				})
+			}
+		})
+	</script>
+
+	<footer id="gtco-footer" role="contentinfo">
+		<div class="gtco-container">
+			<div class="row row-p	b-md">
+
+				<div class="col-md-4">
+					<div class="gtco-widget">
+						<h3>About Us</h3>
+						<p>We are an airlines forged by the great Duncan, he is our lord and saviour and our best pilot in the fleet. Borned from the heavens, he is gilded with the best intuition with safety being his number one priority. All hail the great Duncan!</p>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>      </h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">      </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">   </a></li>
+							<li><a href="#">     </a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Promotions</h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">Europe</a></li>
+							<li><a href="#">Asia</a></li>
+							<li><a href="#">America</a></li>
+							<li><a href="#">Canada</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-3 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Get In Touch</h3>
+						<ul class="gtco-quick-contact">
+							<li><a href="#"><i class="icon-phone"></i> +1 234 567 890</a></li>
+							<li><a href="#"><i class="icon-mail2"></i> info@freehtml5.co</a></li>
+							<li><a href="#"><i class="icon-chat"></i> Live Chat</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="row copyright">
+				<div class="col-md-12">
+					<p class="pull-left">
+						<small class="block">&copy; 2016 Free HTML5. All Rights Reserved.</small> 
+						<small class="block">Designed by <a href="https://freehtml5.co/" target="_blank">FreeHTML5.co</a> Demo Images: <a href="http://unsplash.com/" target="_blank">Unsplash</a></small>
+					</p>
+					<p class="pull-right">
+						<ul class="gtco-social-icons pull-right">
+							<li><a href="#"><i class="icon-twitter"></i></a></li>
+							<li><a href="#"><i class="icon-facebook"></i></a></li>
+							<li><a href="#"><i class="icon-linkedin"></i></a></li>
+							<li><a href="#"><i class="icon-dribbble"></i></a></li>
+						</ul>
+					</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- </div> -->
+
+	</div>
+
+	<div class="gototop js-top">
+		<a href="#" class="js-gotop"><i class="icon-arrow-up"></i></a>
+	</div>
+	
+	<!-- jQuery -->
+	<script src="js/jquery.min.js"></script>
+	<!-- jQuery Easing -->
+	<script src="js/jquery.easing.1.3.js"></script>
+	<!-- Bootstrap -->
+	<script src="js/bootstrap.min.js"></script>
+	<!-- Waypoints -->
+	<script src="js/jquery.waypoints.min.js"></script>
+	<!-- Carousel -->
+	<script src="js/owl.carousel.min.js"></script>
+	<!-- countTo -->
+	<script src="js/jquery.countTo.js"></script>
+
+	<!-- Stellar Parallax -->
+	<script src="js/jquery.stellar.min.js"></script>
+
+	<!-- Magnific Popup -->
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/magnific-popup-options.js"></script>
+	
+	<!-- Datepicker -->
+	<script src="js/bootstrap-datepicker.min.js"></script>
+	
+
+	<!-- Main -->
+	<script src="js/main.js"></script>
+
+	</body>
+</html>
+

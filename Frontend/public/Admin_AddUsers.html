@@ -1,0 +1,784 @@
+<!DOCTYPE HTML>
+<!--
+	Name: Duncan Lim Qing Rong
+	Class: DISM/FT/2A/01
+	Admin Number: P2136785
+-->
+
+<!--
+	Traveler by freehtml5.co
+	Twitter: http://twitter.com/fh5co
+	URL: http://freehtml5.co
+-->
+<html>
+	<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SP|Air &mdash; Duncan's BED CA2 &mdash; DISM2A01.org</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<meta name="description" content="Free HTML5 Website Template by FreeHTML5.co" />
+	<meta name="keywords" content="free website templates, free html5, free template, free bootstrap, free website template, html5, css3, mobile first, responsive" />
+	<meta name="author" content="FreeHTML5.co" />
+
+  	<!-- Facebook and Twitter integration -->
+	<meta property="og:title" content=""/>
+	<meta property="og:image" content=""/>
+	<meta property="og:url" content=""/>
+	<meta property="og:site_name" content=""/>
+	<meta property="og:description" content=""/>
+	<meta name="twitter:title" content="" />
+	<meta name="twitter:image" content="" />
+	<meta name="twitter:url" content="" />
+	<meta name="twitter:card" content="" />
+
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="css/animate.css">
+	<!-- Icomoon Icon Fonts-->
+	<link rel="stylesheet" href="css/icomoon.css">
+	<!-- Themify Icons-->
+	<link rel="stylesheet" href="css/themify-icons.css">
+	<!-- Bootstrap  -->
+	<link rel="stylesheet" href="css/bootstrap.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/magnific-popup.css">
+
+	<!-- Magnific Popup -->
+	<link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
+
+	<!-- Owl Carousel  -->
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+
+	<!-- Theme style  -->
+	<link rel="stylesheet" href="css/style.css">
+	
+	<!-- Icons -->
+	<script src="https://kit.fontawesome.com/4d486d1312.js" crossorigin="anonymous"></script>
+
+	<!-- Modernizr JS -->
+	<script src="js/modernizr-2.6.2.min.js"></script>
+	<!-- FOR IE9 below -->
+	<!--[if lt IE 9]>
+	<script src="js/respond.min.js"></script>
+	<![endif]-->
+	<!-------------------------------------------------------------------------------------------->
+	<script>
+		function clearLocal() {
+			localStorage.clear();
+		}
+	</script>
+
+	<script>  
+			$(document).ready(function () {  
+				const userData = localStorage.getItem('userInfo')
+				const userJSONData = JSON.parse(userData)
+
+				//--------------------------Creation Handler----------------------------
+				$("#Create_btn").click(function () {  
+					var tmpUsername = $('#name').val();
+					var tmpEmail = $('#email').val();
+					var tmpContact = $('#contact').val()
+					var tmpRole = $('#Role').val()
+					var tmpPassword = $('#NewPassword').val()
+					var tmpConPassword = $('#ConfirmPassword').val()
+
+					var tmpProfile_Pic_URL = ''
+
+					var UserID = ''
+
+					//Token
+					var tmpToken = localStorage.getItem('token');
+
+					if (tmpUsername == undefined || tmpUsername == ' ' || tmpEmail == undefined || tmpEmail == '' || tmpEmail == '' || tmpContact == undefined || tmpContact == '' || tmpContact == null || tmpRole == null || tmpRole == undefined || tmpPassword == undefined || tmpPassword == '' || tmpPassword == null || tmpConPassword == undefined || tmpConPassword == '' || tmpConPassword == null) {
+						$("#SuccessMsg").replaceWith(`<label style="color: rgba(255, 0, 0, 0.552); font-weight: 400;">Failed to Create User - Please Fill Required Fields</label>`)
+					
+					} else {
+
+						if (document.getElementById("profilePicInput").files.length != 0) {
+
+							var FD = new FormData()
+							FD.append( 'ProfilePicture', $('#profilePicInput')[0].files[0]);
+
+							$.ajax({
+								headers: {'authorization': 'Bearer '+ tmpToken}, 
+								url: `http://localhost:8081/api/ImageUpload`,  
+								type: 'POST',
+								data: FD,  
+								processData: false,
+								contentType: false,
+								success: function (data, textStatus, xhr) {
+									tmpProfile_Pic_URL = JSON.parse(JSON.stringify(data))
+
+									var ProfilePicName = tmpProfile_Pic_URL.replace(/^.*[\\\/]/, '')
+
+									var data = "{\"Username\":\""+tmpUsername+"\", \"Email\":\""+tmpEmail+"\", \"Contact\":\""+tmpContact+"\", \"Password\":\""+tmpConPassword+"\", \"Role\":\""+tmpRole+"\", \"Profile_Pic_URL\":\""+ProfilePicName+"\"}"; 
+									
+									$.ajax({   
+										headers: {'authorization': 'Bearer '+ tmpToken},     
+										url: 'http://localhost:8081/api/users',  
+										type: 'POST',
+										data: data,  
+										contentType: "application/json; charset=utf-8",
+										dataType: 'json',  
+										success: function (data, textStatus, xhr) { 
+											UserID = console.log(JSON.stringify(data['UserID']))
+											UserID = JSON.parse(data['UserID'])
+											alert('User Added Successfully, Newly Created User ID: ' + UserID)
+					
+											location.reload()            
+										},  
+										error: function (xhr, textStatus, errorThrown) { 
+											$("#SuccessMsg").replaceWith(`<label style="color: rgba(255, 0, 0, 0.552); font-weight: 400;">Failed to Create User - Please Enter Valid Values</label>`)
+											console.log('Error in Operation');  
+											console.log(JSON.stringify(xhr))
+											console.log(textStatus)
+											console.log(JSON.stringify(errorThrown))
+										}  
+									})                 
+								},
+
+								error: function (xhr, textStatus, errorThrown) {
+									alert('Failed to Create User - Image Must Be 1MB Or Below & In The JPG or PNG Format</label>')
+									console.log('Error in Operation');  
+									console.log(JSON.stringify(xhr))
+									console.log(textStatus)
+									console.log(JSON.stringify(errorThrown))
+								}
+							})
+
+						} else {
+							var data = "{\"Username\":\""+tmpUsername+"\", \"Email\":\""+tmpEmail+"\", \"Contact\":\""+tmpContact+"\", \"Password\":\""+tmpConPassword+"\", \"Role\":\""+tmpRole+"\", \"Profile_Pic_URL\":\""+''+"\"}"; 
+
+							$.ajax({   
+								headers: {'authorization': 'Bearer '+ tmpToken},     
+								url: 'http://localhost:8081/api/users',  
+								type: 'POST',
+								data: data,  
+								contentType: "application/json; charset=utf-8",
+								dataType: 'json',  
+								success: function (data, textStatus, xhr) { 
+									UserID = console.log(JSON.stringify(data['UserID']))
+									UserID = JSON.parse(data['UserID'])
+									alert('User Added Successfully, Newly Created User ID: ' + UserID)
+			
+									location.reload()                 
+								},  
+								error: function (xhr, textStatus, errorThrown) { 
+									$("#SuccessMsg").replaceWith(`<label style="color: rgba(255, 0, 0, 0.552); font-weight: 400;">Failed to Create User - Please Enter Valid Values</label>`)
+									console.log('Error in Operation');  
+									console.log(JSON.stringify(xhr))
+									console.log(textStatus)
+									console.log(JSON.stringify(errorThrown))
+								}  
+							})                 
+						}
+					}
+					return false
+				});  
+
+				$("#Logout").click(function () {
+					localStorage.clear();
+					window.location.assign("http://localhost:3001/login.html");
+				})
+			})
+	</script> 
+
+	<script>
+		$(document).ready(function() {
+
+			$('.form-control').on('keypress', function(e) {
+				if (e.which == 32){
+					console.log('Space Detected');
+					return false;
+				}
+			});
+		})
+	</script>
+
+	<script>
+		$(document).ready(function () {
+
+			var fields = document.getElementsByClassName("validated-field")
+
+			if (Array.from(fields).length > 0) {
+				Array.from(fields).forEach(field => {
+					field.addEventListener("input", function(e) {
+			
+					if (!e.target.value) {
+						e.target.classList.add("not-valid")
+						
+					} else {
+						e.target.classList.remove("not-valid")
+
+						var Password = document.getElementById("NewPassword").value;
+						var ConfirmPassword = document.getElementById("ConfirmPassword").value;
+
+						if (Password != ConfirmPassword) {
+							var PasswdInput = document.getElementById('NewPassword')
+							var ConfirmInput = document.getElementById('ConfirmPassword')
+
+							PasswdInput.classList.add("not-valid")
+							ConfirmInput.classList.add("not-valid")
+
+						} else {
+							var PasswdInput = document.getElementById('NewPassword')
+							var ConfirmInput = document.getElementById('ConfirmPassword')
+
+							PasswdInput.classList.remove("not-valid")
+							ConfirmInput.classList.remove("not-valid")
+						}
+
+						}
+					})
+				})
+			}
+		})
+
+	</script>
+
+	<script>
+		function getDateAndTime (Timestamp){
+
+			var d = new Date(Timestamp);
+			d.getUTCFullYear();
+			d.getUTCMonth();
+			d.getUTCDate();
+			d.getUTCHours();
+			d.getUTCMinutes();
+			d.getUTCSeconds()
+			return(d.toUTCString())
+		}
+	</script>
+
+	<!-------------Users Table Filler-------------->
+	<script>
+		$(document).ready(function() {
+
+			$.ajax({
+				url: 'http://localhost:8081/api/users',
+				type: 'GET',
+				contentType: "application/json;",
+				dataType: 'json',
+				success: function (data, textStatus, xhr) {
+
+					if (data != null) {
+						sessionStorage.setItem("UsersList", JSON.stringify(data))
+						console.log('GET Success [Users]')
+						var Usrs = sessionStorage.getItem("UsersList")
+						var UsersJSONData = JSON.parse(Usrs)
+
+						for(let i = 0; i < UsersJSONData.length; i++) {
+							document.getElementById("UsersTable").innerHTML += `<tr>
+																					<td style="width: 100px;">${UsersJSONData[i].UserID}</th>
+																					<td style="width: auto;">${UsersJSONData[i].Username}</th>
+																					<td style="width: auto;">${UsersJSONData[i].Email}</th>
+																					<td style="width: auto;">${UsersJSONData[i].Contact}</th>
+																					<td style="width: auto;">${UsersJSONData[i].Password}</th>
+																					<td style="width: auto;">${UsersJSONData[i].Role}</th>
+																					<td style="width: auto;">${UsersJSONData[i].Profile_Pic_URL}</th>
+																				</tr>`
+						}
+
+					} else {
+						console.log('GET Failure [Users]')
+					}
+				},
+				error: function (xhr, textStatus, errorThrown) {
+					console.log('Error in Operation');  
+					console.log(JSON.stringify(xhr))
+					console.log(textStatus)
+					console.log(JSON.stringify(errorThrown))
+				}
+			})
+
+			return false
+		})
+	</script>
+	</head>
+	<body>
+		
+	<div class="gtco-loader"></div>
+	
+	<div id="page">
+
+	
+	<!-- <div class="page-inner"> -->
+		<nav class="gtco-nav" role="navigation">
+			<div class="gtco-container">
+				
+				<div class="row">
+					<div class="col-sm-2 col-xs-12">
+						<div id="gtco-logo"><a href="Admin_Home.html">SP|Air <em>.</em></a></div>
+					</div>
+					<div class="col-xs-10 text-right menu-1">
+						<ul>
+							<li class="has-dropdown">
+								<a href="#">Manage Flights</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddFlights.html">Add Flight</a></li>
+									<li><a href="Admin_DeleteFlights.html">Delete Flights</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown active">
+								<a href="#">Manage Users</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddUsers.html">Add Users</a></li>
+									<li><a href="Admin_DeleteUsers.html">Delete Users</a></li>
+									<li><a href="Admin_UpdateUsers.html">Update Users Information</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a href="#">Manage Bookings</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddBooking.html">Add Bookings</a></li>
+									<li><a href="Admin_DeleteBookings.html">Delete Bookings</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a href="#">Manage Airports</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddAirport.html">Add Airports</a></li>
+									<li><a href="Admin_DeleteAirport.html">Delete Airports</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a href="#">Manage Promotions</a>
+								<ul class="dropdown">
+									<li><a href="Admin_AddPromo.html">Add Promotions</a></li>
+									<li><a href="Admin_DeletePromo.html">Delete Promotions</a></li>
+								</ul>
+							</li>
+							<li class="has-dropdown">
+								<a id="NavUName" href="#"></a>
+								<ul class="dropdown">
+									<li><a href="Admin_Profile.html">View Profile</a></li>
+									<li><a id="Logout" href="index.html" onclick="clearLocal()">Logout</a></li>
+								</ul>
+							</li>
+						</ul>	
+					</div>
+				</div>
+			</div>
+		</nav>
+
+	<script>
+		//Retrieve User Data from Local Storage
+		const userData = localStorage.getItem('userInfo')
+		const userJSONData = JSON.parse(userData)
+		var navUname = userJSONData[0].Username
+
+		//Show Username on Nav Bar
+		const listItem = document.querySelector("#NavUName");
+		const newItem = document.createElement('li');
+		newItem.innerHTML = `<a href="#">${navUname}</a>`;	
+		listItem.parentNode.replaceChild(newItem, listItem);
+	</script>
+
+	<header id="gtco-header" class="gtco-cover gtco-cover-md" role="banner" style="background-image: url(images/freestocks-Sm0WHQnZmlw-unsplash.jpg); max-height: 700px;">
+		<div class="overlay"></div>
+		<div class="gtco-container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-0 text-center">
+					<div class="row row-mt-15em">
+						<div class="col-md-12 mt-text animate-box" data-animate-effect="fadeInUp">
+							<h1>Add Users</h1>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<script>
+		$(document).ready(function() {
+			
+			window.onload = function() {
+
+				//Use Placeholder Image
+				document.getElementById("ProfilePic").src = 'http://localhost:8081/api/Uploads/User_Placeholder.png'
+				document.getElementById("PPStatus").innerHTML = `No Profile Picture`;
+				
+				var fileInput = document.getElementById('profilePicInput');
+				var fileDisplayArea = document.getElementById('ProfilePicTmpDisplay');
+				
+				var check = false
+
+				if (document.getElementById('ProfilePicTmpDisplay')) {
+
+					if(fileInput) {
+						fileInput.addEventListener('change', function(e) {
+						var file = fileInput.files[0];
+						console.log(file)
+						var imageType = /image.png/
+						var imageType2 = /image.jpeg/
+						
+						//Function to Remove Parent Element while keeping Child Elements
+						function removeElement () {
+							const child = document.getElementById('PPandStat');
+							document.getElementById("parent").removeChild(child);
+							return true
+					}
+
+					if (file.type.match(imageType) || file.type.match(imageType2)) {
+
+						if (check == !true){
+							check = removeElement()
+
+							var reader = new FileReader();
+
+							reader.onload = function(e) {
+								fileDisplayArea.innerHTML = "";
+
+								var img = new Image();
+								console.log("Image:" + img)
+
+								img.src = reader.result;
+
+								fileDisplayArea.appendChild(img);
+
+							}
+
+							reader.readAsDataURL(file);	
+
+						} else {
+							var reader = new FileReader();
+
+							reader.onload = function(e) {
+								fileDisplayArea.innerHTML = "";
+
+								var img = new Image();
+								console.log("Image:" + img)
+
+								img.src = reader.result;
+
+								fileDisplayArea.appendChild(img);
+
+							}
+
+							reader.readAsDataURL(file);		
+						}
+
+					} else {
+						document.getElementById("ProfilePicTmpDisplay").remove()
+
+						var html = `<div id="PPandStat" style="border: 1px solid lightgrey; border-radius: 10px; max-width: 350px;">
+										<img src="http://localhost:8081/api/Uploads/User_Placeholder.png" id="ProfilePic" alt="Profile_Picture" style="width:100%; max-width: 350px; height: 380px; object-fit: cover;">
+								
+										<div id="PPDiv">
+											<label id="PPStatus" style="margin: 0 auto; text-align: center; color: black"></label>
+										</div>
+									</div>`
+						
+						document.getElementById("parent").insertAdjacentHTML("afterbegin",html);
+						
+						document.getElementById("PPStatus").innerHTML = `File Not Supported`;
+							}
+						});
+					} 
+
+				//Else If PPTmpDisplay Does NOT exist
+				} else {
+
+					if(fileInput) {
+						fileInput.addEventListener('change', function(e) {
+						var file = fileInput.files[0];
+						console.log(file)
+						var imageType = /image.png/
+						var imageType2 = /image.jpeg/
+						
+						//Function to Remove Parent Element while keeping Child Elements
+						function removeElement () {
+							const child = document.getElementById('PPandStat');
+							document.getElementById("parent").removeChild(child);
+							return true
+					}
+
+					var html1 = `<div id="ProfilePicTmpDisplay"></div>`
+					document.getElementById("PP").insertAdjacentHTML("afterbegin",html1);
+
+					if (file.type.match(imageType) || file.type.match(imageType2)) {
+
+						if (check == !true){
+							check = removeElement()
+
+							var reader = new FileReader();
+
+							reader.onload = function(e) {
+								fileDisplayArea.innerHTML = "";
+
+								var img = new Image();
+								console.log("Image:" + img)
+
+								img.src = reader.result;
+
+								fileDisplayArea.appendChild(img);
+
+							}
+
+							reader.readAsDataURL(file);	
+
+						} else {
+							var reader = new FileReader();
+
+							reader.onload = function(e) {
+								fileDisplayArea.innerHTML = "";
+
+								var img = new Image();
+								console.log("Image:" + img)
+
+								img.src = reader.result;
+
+								fileDisplayArea.appendChild(img);
+
+							}
+
+							reader.readAsDataURL(file);		
+						}
+
+					} else {
+						document.getElementById("ProfilePicTmpDisplay").remove()
+
+						var html = `<div id="PPandStat" style="border: 1px solid lightgrey; border-radius: 10px; max-width: 350px;">
+										<img src="http://localhost:8081/api/Uploads/User_Placeholder.png" id="ProfilePic" alt="Profile_Picture" style="width:100%; max-width: 350px; height: 380px; object-fit: cover;">
+								
+										<div id="PPDiv">
+											<label id="PPStatus" style="margin: 0 auto; text-align: center; color: black"></label>
+										</div>
+									</div>`
+						
+						document.getElementById("parent").insertAdjacentHTML("afterbegin",html);
+						
+						document.getElementById("PPStatus").innerHTML = `File Not Supported`;
+							}
+						});
+					}
+				}
+			}
+		})
+	</script>
+
+	<div class="gtco-section border-bottom">
+		<div class="gtco-container">
+			<div class="row">
+				<!----------User Table---------->
+				<div class="col-md-12 animate-box" style="padding: 0;">	
+					<div class="gtco-contact-info">
+						<h3>Users Table</h3>
+						<div id="BookingsTableWrapper" class="table-wrapper disable-select" style="margin-top: 0px; width: 1100px; width: auto;">
+							<table class="fl-table">
+								<thead>
+								<tr>
+									<th style="width: 10%;">User ID</th>
+									<th style="width: 15%;">Username</th>
+									<th style="width: 15%;">Email</th>
+									<th style="width: 10%;">Contact</th>
+									<th style="width: auto;">Password</th>
+									<th style="width: 10%;">Role</th>
+									<th style="width: auto;">Profile Picture</th>
+								</tr>
+								</thead>
+								<tbody id="UsersTable"><tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<!-------------Input Form------------>
+				<div class="col-md-6 animate-box" style="padding-left: 0; margin-top: 50px">
+					<div class="animate-box" id="FormWrapper">
+					<h3>User Details</h3>
+					<label id="SuccessMsg"></label>
+					<form action="#">
+						<div class="row form-group">
+							<div class="col-md-12">
+								<label for="name">New Username</label>
+								<input type="text" id="name" class="form-control" placeholder="New Username" required>
+							</div>
+							
+						</div>
+
+						<div class="row form-group">
+							<div class="col-md-12">
+								<label for="email">Email</label>
+								<input type="email" id="email" class="form-control" placeholder="Example@gmail.com" required>
+							</div>
+						</div>
+
+						<div class="row form-group">
+							<div class="col-md-12">
+								<label for="phone">Contact No.</label>
+								<input type="tel" id="contact" class="form-control" pattern="\d{8}" placeholder="Eg. 85248091" maxlength="8" required>
+							</div>
+						</div>
+
+						<div class="row form-group">
+							<div class="col-md-12">
+								<label for="Role">Role</label>
+								<select type="Role" id="Role" class="form-control" required>
+									<option value="" disabled selected>Select Role</option>
+									<option value="Customer">Customer</option>
+									<option value="Admin">Admin</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="row form-group">
+							<div class="col-md-12">
+								<label for="Password">New Password</label>
+								<input type="password" id="NewPassword" class="form-control validated-field" placeholder="New Password" required>
+							</div>
+						</div>
+
+						<div class="row form-group">
+							<div class="col-md-12">
+								<label for="Password">Confirm Password</label>
+								<input type="password" id="ConfirmPassword" class="form-control validated-field" placeholder="Confirm Password" required>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<input type="submit" value="Create Account" id="Create_btn" class="btn btn-primary">
+						</div>
+					</form>	
+				</div>
+				</div>
+				<!---------Image Input----------->
+				<div class="col-md-5 col-md-push-1 animate-box" style="margin-top: 115px;">	
+					<h4 style="margin-left: 120px;">Profile Picture</h4>
+					<div id="parent" class="gtco-contact-info">
+						<div id="PPandStat" style="border: 1px solid lightgrey; border-radius: 10px; max-width: 350px;">
+							<img src="http://localhost:8081/api/public/pic.jpg" id="ProfilePic" alt="Profile_Picture" style="width:100%; max-width: 350px; height: 380px; object-fit: cover;">
+							
+							<div id="PPDiv">
+								<label id="PPStatus" style="margin: 0 auto; text-align: center; color: black"></label>
+							</div>
+						</div>
+	
+						<div class="row form-group">
+							<div id="PP" class="col-md-12">
+								<div id="ProfilePicTmpDisplay"></div>
+								<label for="image"><br>Choose A Profile Picture [Optional]</label>
+								<input type="file" name="avatar" id="profilePicInput" accept="image/jpeg, image/png">
+							</div>
+						</div>
+						<div class="gtco-contact-info">
+							<ul>
+								<li class="address">Profile Picture Requirements: <br>Size: Below 1 MB<br>Format: JPG or PNG</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer id="gtco-footer" role="contentinfo">
+		<div class="gtco-container">
+			<div class="row row-p	b-md">
+
+				<div class="col-md-4">
+					<div class="gtco-widget">
+						<h3>About Us</h3>
+						<p>We are an airlines forged by the great Duncan, he is our lord and saviour and our best pilot in the fleet. Borned from the heavens, he is gilded with the best intuition with safety being his number one priority. All hail the great Duncan!</p>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>      </h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">      </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">    </a></li>
+							<li><a href="#">   </a></li>
+							<li><a href="#">     </a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-2 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Promotions</h3>
+						<ul class="gtco-footer-links">
+							<li><a href="#">Europe</a></li>
+							<li><a href="#">Asia</a></li>
+							<li><a href="#">America</a></li>
+							<li><a href="#">Canada</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-3 col-md-push-1">
+					<div class="gtco-widget">
+						<h3>Get In Touch</h3>
+						<ul class="gtco-quick-contact">
+							<li><a href="#"><i class="icon-phone"></i> +1 234 567 890</a></li>
+							<li><a href="#"><i class="icon-mail2"></i> info@freehtml5.co</a></li>
+							<li><a href="#"><i class="icon-chat"></i> Live Chat</a></li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="row copyright">
+				<div class="col-md-12">
+					<p class="pull-left">
+						<small class="block">&copy; 2016 Free HTML5. All Rights Reserved.</small> 
+						<small class="block">Designed by <a href="https://freehtml5.co/" target="_blank">FreeHTML5.co</a> Demo Images: <a href="http://unsplash.com/" target="_blank">Unsplash</a></small>
+					</p>
+					<p class="pull-right">
+						<ul class="gtco-social-icons pull-right">
+							<li><a href="#"><i class="icon-twitter"></i></a></li>
+							<li><a href="#"><i class="icon-facebook"></i></a></li>
+							<li><a href="#"><i class="icon-linkedin"></i></a></li>
+							<li><a href="#"><i class="icon-dribbble"></i></a></li>
+						</ul>
+					</p>
+				</div>
+			</div>
+
+		</div>
+	</footer>
+	<!-- </div> -->
+
+	</div>
+
+	<div class="gototop js-top">
+		<a href="#" class="js-gotop"><i class="icon-arrow-up"></i></a>
+	</div>
+	
+	<!-- jQuery -->
+	<script src="js/jquery.min.js"></script>
+	<!-- jQuery Easing -->
+	<script src="js/jquery.easing.1.3.js"></script>
+	<!-- Bootstrap -->
+	<script src="js/bootstrap.min.js"></script>
+	<!-- Waypoints -->
+	<script src="js/jquery.waypoints.min.js"></script>
+	<!-- Carousel -->
+	<script src="js/owl.carousel.min.js"></script>
+	<!-- countTo -->
+	<script src="js/jquery.countTo.js"></script>
+
+	<!-- Stellar Parallax -->
+	<script src="js/jquery.stellar.min.js"></script>
+
+	<!-- Magnific Popup -->
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/magnific-popup-options.js"></script>
+	
+	<!-- Datepicker -->
+	<script src="js/bootstrap-datepicker.min.js"></script>
+	
+
+	<!-- Main -->
+	<script src="js/main.js"></script>
+
+	</body>
+</html>
+
